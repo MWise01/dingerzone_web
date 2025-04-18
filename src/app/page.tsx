@@ -3,11 +3,12 @@
 
 import Header from '../components/Header';
 // import batter from '../../public/assets/images/extension_swing_keypoints.png';
-import React, { useState, Image } from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 
 export default function LandingPage() {
-
   const [activeTab, setActiveTab] = React.useState('Player');
+  const [openFaq, setOpenFaq] = React.useState(null);
 
   const benefits = {
     Player: [
@@ -30,13 +31,52 @@ export default function LandingPage() {
     ],
   };
 
+  const faqs = [
+    {
+      question: 'How does DingerZone help improve my swing?',
+      answer: 'Our AI analyzes your swing videos, providing instant feedback on technique and recommending personalized drills from our YouTube catalog, helping you train smarter from home.',
+    },
+    {
+      question: 'Can I record videos anywhere, or do I need special equipment?',
+      answer: 'Record anywhere using your smartphone—no expensive hardware or facility visits required. Just upload your swing, and our AI does the rest.',
+    },
+    {
+      question: 'How do I share my videos with my coach?',
+      answer: 'Easily share clips via our secure permission workflow. Grant access to your coach, who can review your swings and provide feedback in one place.',
+    },
+    {
+      question: 'Is DingerZone suitable for families with multiple players?',
+      answer: 'Yes! Our family plan lets you manage multiple players under one account, saving time and money while tracking everyone’s progress.',
+    },
+    {
+      question: 'What kind of feedback does the AI provide?',
+      answer: 'The AI identifies key swing mechanics (e.g., stance, hip rotation) and suggests specific improvements, paired with drill videos to help you practice effectively.',
+    },
+    {
+      question: 'Can coaches manage multiple players’ swings?',
+      answer: 'Absolutely. Coaches get a centralized dashboard to review all their players’ videos, access AI insights, and assign drills, streamlining team training.',
+    },
+    {
+      question: 'Is my video data secure?',
+      answer: 'We prioritize privacy with secure storage on AWS and a permission-based sharing system, ensuring only authorized users (e.g., coaches, parents) access your clips.',
+    },
+    {
+      question: 'Do I need a subscription to use DingerZone?',
+      answer: 'Start with our free plan for basic features. Upgrade to a family or coach plan for premium features like unlimited uploads and advanced analytics.',
+    },
+  ];
+
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header Banner */}
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-visible h-[500px]">
+      <section id="home-section" className="relative overflow-hidden h-[500px]">
         <div
           className="w-full h-full bg-cover bg-center relative"
           style={{ backgroundColor: '#1A1A2E' }}
@@ -78,7 +118,8 @@ export default function LandingPage() {
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto flex flex-col lg:flex-row py-12 px-6 flex-grow relative z-30 bg-white">
+      <section id="benefits-section" className="container mx-auto flex flex-col lg:flex-row py-12 px-6 bg-white">
+      {/* <main className="container mx-auto flex flex-col lg:flex-row py-12 px-6 flex-grow relative z-30 bg-white"> */}
         <div className="lg:w-1/2 flex flex-col space-y-4">
           <img
             src="/path-to-screenshot1.jpg"
@@ -206,13 +247,151 @@ export default function LandingPage() {
               href="https://apps.apple.com/your-app-link"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-green-700"
+              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-800"
             >
               Download on the App Store
             </a>
           </div>
         </div>
-      </main>
+      </section>
+      {/* </main> */}
+
+      {/* Subscriptions Section */}
+      <section id="subscriptions-section" className="container mx-auto py-12 px-6 bg-gray-100">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">Subscriptions: Choose Your Plan</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          Unlock premium features with our flexible plans, including family accounts and coach access.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Free Plan</h3>
+            <p className="text-gray-600">Basic video uploads and AI feedback.</p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
+              Get Started
+            </button>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Family Plan</h3>
+            <p className="text-gray-600">Manage multiple players, share with coaches.</p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
+              Learn More
+            </button>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Coach Plan</h3>
+            <p className="text-gray-600">Access all players’ swings and analytics.</p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
+              Learn More
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about-section" className="container mx-auto py-12 px-6 bg-white">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">About DingerZone</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          DingerZone empowers players, parents, and coaches with AI-driven swing analysis, letting you record anywhere, get instant feedback, and connect with your team. No expensive hardware or facilities required—just your phone and passion for the game.
+        </p>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="md:w-1/2">
+            <h3 className="text-xl font-semibold mb-2">Our Mission</h3>
+            <p className="text-gray-600">
+              Make swing improvement accessible to every player, from backyard to big leagues.
+            </p>
+          </div>
+          <div className="md:w-1/2">
+            <h3 className="text-xl font-semibold mb-2">Why Choose Us</h3>
+            <p className="text-gray-600">
+              User-controlled videos, AI insights, and seamless coach/parent collaboration.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest News Section
+      <section id="latest-news-section" className="container mx-auto py-12 px-6 bg-gray-100">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">Latest News</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          Stay updated with DingerZone’s new features, tips, and community stories.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">New AI Drill Recommendations</h3>
+            <p className="text-gray-600">
+              Our latest update includes personalized drill videos tailored to your swing.
+            </p>
+            <a href="#" className="mt-4 inline-block text-blue-600 hover:underline">
+              Read More
+            </a>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-2">Community Spotlight</h3>
+            <p className="text-gray-600">
+              Meet Jake, a high school player who improved his swing with DingerZone.
+            </p>
+            <a href="#" className="mt-4 inline-block text-blue-600 hover:underline">
+              Read More
+            </a>
+          </div>
+        </div>
+      </section> */}
+
+      {/* FAQ Section */}
+      <section id="faq-section" className="container mx-auto py-12 px-6 bg-gray-100">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">Frequently Asked Questions</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          Got questions? We’ve got answers about how DingerZone works for players, parents, and coaches.
+        </p>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md">
+              <button
+                onClick={() => toggleFaq(index)}
+                className="w-full flex justify-between items-center px-6 py-4 text-left text-lg font-semibold text-gray-800 hover:bg-gray-50"
+                aria-expanded={openFaq === index}
+                aria-controls={`faq-answer-${index}`}
+              >
+                <span>{faq.question}</span>
+                <span className="text-2xl">
+                  {openFaq === index ? '−' : '+'}
+                </span>
+              </button>
+              {openFaq === index && (
+                <div
+                  id={`faq-answer-${index}`}
+                  className="px-6 py-4 text-gray-600 bg-gray-50"
+                >
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact Us Section */}
+      <section id="contact-section" className="container mx-auto py-12 px-6 bg-white">
+        <h2 className="text-3xl font-bold mb-4 text-gray-800">Contact Us</h2>
+        <p className="text-lg text-gray-700 mb-6">
+          Have questions or feedback? Reach out to our team, and we’ll get back to you soon.
+        </p>
+        <div className="bg-gray-100 p-6 rounded-lg">
+          <h3 className="text-xl font-semibold mb-2">Email Us</h3>
+          <p className="text-gray-600 mb-4">
+            Get in touch. Email us @:{' '}
+            <a
+              href="mailto:feedback@dingerzone.ai"
+              className="text-blue-600 hover:underline"
+            >
+              feedback@dingerzone.ai
+            </a>
+          </p>
+          {/* <button className="px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-700">
+            Contact Support
+          </button> */}
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-100 py-6">
