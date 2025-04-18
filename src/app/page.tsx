@@ -10,6 +10,10 @@ export default function LandingPage() {
   const [activeTab, setActiveTab] = React.useState('Player');
   const [openFaq, setOpenFaq] = React.useState(null);
 
+  const getStatedClick = () => {
+    window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent('DingerZone Subscription')}`;
+  };
+
   const benefits = {
     Player: [
       'Record your swing anywhere, anytime—no fancy gear needed.',
@@ -120,18 +124,39 @@ export default function LandingPage() {
       {/* Main Content */}
       <section id="benefits-section" className="container mx-auto flex flex-col lg:flex-row py-12 px-6 bg-white">
       {/* <main className="container mx-auto flex flex-col lg:flex-row py-12 px-6 flex-grow relative z-30 bg-white"> */}
-        <div className="lg:w-1/2 flex flex-col space-y-4">
+        {/* <div className="lg:w-1/2 flex flex-col space-y-4">
           <img
-            src="/path-to-screenshot1.jpg"
-            alt="App Screenshot 1"
-            className="rounded shadow-md"
+            src="/assets/images/login_profile_3d.png"
+            alt="Login Screenshot"
+            width={200}
+            
+            // className="rounded shadow-md"
           />
           <img
             src="/path-to-screenshot2.jpg"
             alt="App Screenshot 2"
             className="rounded shadow-md"
           />
+        </div> */}
+
+        {/* Option 2: Overlapping Images with Custom Positioning */}
+        <div className="lg:w-1/2 relative h-[400px] flex items-center justify-center">
+          <Image
+            src="/assets/images/allhits_screen_3d.png"
+            alt="Summary Swings Screenshot"
+            width={200}
+            height={400}
+            className="absolute rounded z-30 -translate-x-12 md:-translate-x-16"
+          />
+          <Image
+            src="/assets/images/scorecard_3d.png"
+            alt="Scorecard Screenshot"
+            width={200}
+            height={400}
+            className="absolute rounded z-20 translate-x-12 md:translate-x-16"
+          />
         </div>
+
         {/* <div className="lg:w-1/2 lg:pl-12 mt-8 lg:mt-0">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Why You'll Love Our App</h2>
           <div className="flex space-x-4 mb-6">
@@ -264,24 +289,24 @@ export default function LandingPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Free Plan</h3>
-            <p className="text-gray-600">Basic video uploads and AI feedback.</p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
+            <h3 className="text-xl font-semibold mb-2">Player</h3>
+            <p className="text-gray-600">Manage the whole family<br /> Share with Teams and Coaches. <br /> Unlimited AI Feedback & Tips </p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800" onClick={getStatedClick}>
               Get Started
             </button>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Family Plan</h3>
-            <p className="text-gray-600">Manage multiple players, share with coaches.</p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
-              Learn More
+            <h3 className="text-xl font-semibold mb-2">Coach</h3>
+            <p className="text-gray-600">Access players’ swings and stats.<br /> Give feedback and assign drills.<br /><br /></p>
+            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800" onClick={getStatedClick}>
+              Get Started
             </button>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Coach Plan</h3>
-            <p className="text-gray-600">Access all players’ swings and analytics.</p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800">
-              Learn More
+            <h3 className="text-xl font-semibold mb-2">Trainer (Coming Soon)</h3>
+            <p className="text-gray-600">Unlimited connections. <br /> Grow your lineup. <br /> Custom models tailored to you.</p>
+            <button className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-3xl hover:bg-blue-800">
+              Coming Soon
             </button>
           </div>
         </div>
