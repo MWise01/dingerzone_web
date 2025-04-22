@@ -7,14 +7,21 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 
 export default function LandingPage() {
-  const [activeTab, setActiveTab] = React.useState('Player');
-  const [openFaq, setOpenFaq] = React.useState(null);
+  const [activeTab, setActiveTab] = useState<'Player' | 'Parent' | 'Coach'>('Player');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const tabs: ('Player' | 'Parent' | 'Coach')[] = ['Player', 'Parent', 'Coach'];
 
   const getStatedClick = () => {
     window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent('DingerZone Subscription')}`;
   };
 
-  const benefits = {
+  type BenefitType = {
+    Player: string[];
+    Parent: string[];
+    Coach: string[];
+  };
+
+  const benefits: BenefitType = {
     Player: [
       'Record your swing anywhere, anytime—no fancy gear needed.',
       'Get instant AI tips to level up your swing, plus drills you can actually do.',
@@ -70,7 +77,7 @@ export default function LandingPage() {
     },
   ];
 
-  const toggleFaq = (index) => {
+  const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
@@ -231,7 +238,7 @@ export default function LandingPage() {
         <div className="lg:w-1/2 lg:pl-12 mt-8 lg:mt-0">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Hits for the whole LineUp: <br /> Players, Parents, and Coaches</h2>
           <div className="flex space-x-4 mb-6">
-            {['Player', 'Parent', 'Coach'].map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -249,7 +256,7 @@ export default function LandingPage() {
               >
                 <span className="mr-2">
                   {tab === 'Player' && (
-                    <img
+                    <Image
                       src="/assets/icons/baseball_batter_silhouette.svg"
                       alt="Player Icon"
                       width={20}
@@ -259,7 +266,7 @@ export default function LandingPage() {
                     />
                   )}
                   {tab === 'Parent' && (
-                    <img
+                    <Image
                       src="/assets/icons/parent-svgrepo-com.svg"
                       alt="Parent Icon"
                       width={20}
@@ -269,7 +276,7 @@ export default function LandingPage() {
                     />
                   )}
                   {tab === 'Coach' && (
-                    <img
+                    <Image
                       src="/assets/icons/whistle-svgrepo-com.svg"
                       alt="Coach Icon"
                       width={20}
@@ -284,7 +291,7 @@ export default function LandingPage() {
             ))}
           </div>
           <ul className="list-disc pl-5 space-y-4 text-lg text-gray-700">
-            {benefits[activeTab].map((benefit, index) => (
+            {benefits[activeTab].map((benefit: string, index: number) => (
               <li key={index}>{benefit}</li>
             ))}
           </ul>

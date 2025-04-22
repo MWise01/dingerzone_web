@@ -1,7 +1,7 @@
 // src/components/Header.tsx
 "use client";
 
-import Link from 'next/link';
+// import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
 import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
@@ -27,7 +27,7 @@ export default function Header() {
   const [current, setCurrent] = useState('Home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleScroll = (sectionId, name) => {
+  const handleScroll = (sectionId: string, name: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
