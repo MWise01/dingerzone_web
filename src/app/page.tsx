@@ -146,14 +146,35 @@ export default function LandingPage() {
             alt="Summary Swings Screenshot"
             width={200}
             height={400}
-            className="absolute rounded z-30 -translate-x-12 md:-translate-x-16"
+            className="absolute rounded z-50 -translate-x-24 md:-translate-x-48"
           />
           <Image
             src="/assets/images/scorecard_3d.png"
             alt="Scorecard Screenshot"
             width={200}
             height={400}
-            className="absolute rounded z-20 translate-x-12 md:translate-x-16"
+            className="absolute rounded z-40 -translate-x-12 md:-translate-x-24"
+          />
+          <Image
+            src="/assets/images/trainscreen_3d.png"
+            alt="Training Content Screenshot"
+            width={185}
+            height={370}
+            className="absolute rounded z-10 translate-x-24 md:translate-x-48"
+          />
+          <Image
+            src="/assets/images/playercard_3d.png"
+            alt="Player Baseball Card"
+            width={190}
+            height={380}
+            className="absolute rounded z-20 translate-x-12 md:translate-x-24"
+          />
+          <Image
+            src="/assets/images/teamscreen_3d.png"
+            alt="Team Summary Screenshot"
+            width={200}
+            height={400}
+            className="absolute rounded z-30"
           />
         </div>
 
@@ -269,19 +290,20 @@ export default function LandingPage() {
           </ul>
           <div className="mt-6">
             <a
-              href="https://apps.apple.com/your-app-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-800"
+              // Uncomment below link when able to download in app store
+              // href="https://apps.apple.com/your-app-link"
+              // target="_blank"
+              // rel="noopener noreferrer"
+              className="inline-block px-6 py-3 bg-gray-600 text-white rounded-3xl hover:bg-gray-800"
             >
-              Download on the App Store
+              Download on the App Store (Coming Soon)
             </a>
           </div>
         </div>
       </section>
       {/* </main> */}
 
-      {/* Subscriptions Section */}
+      {/* Subscriptions Section // Uncomment when implementing subscriptions
       <section id="subscriptions-section" className="container mx-auto py-12 px-6 bg-gray-100">
         <h2 className="text-3xl font-bold mb-4 text-gray-800">Subscriptions: Choose Your Plan</h2>
         <p className="text-lg text-gray-700 mb-6">
@@ -310,7 +332,7 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* About Section */}
       <section id="about-section" className="container mx-auto py-12 px-6 bg-white">
@@ -429,7 +451,7 @@ export default function LandingPage() {
             <a href="#" className="text-gray-600 hover:text-gray-900">
               Terms of Service
             </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
+            <a href="#" className="text-gray-600 hover:text-gray-900" onClick={getStatedClick}>
               Contact
             </a>
           </div>

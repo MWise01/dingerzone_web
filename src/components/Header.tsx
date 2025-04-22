@@ -15,7 +15,7 @@ import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
 
 const navItems = [
   { name: 'Home', sectionId: 'home-section' },
-  { name: 'Subscriptions', sectionId: 'subscriptions-section' },
+  // { name: 'Subscriptions', sectionId: 'subscriptions-section' },
   { name: 'About', sectionId: 'about-section' },
   { name: 'FAQ', sectionId: 'faq-section' },
   // { name: 'Latest News', sectionId: 'latest-news-section' },
