@@ -1,20 +1,13 @@
 // src/app/head.tsx
 export default function Head() {
-    return (
-      <>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link 
-          rel="preconnect" 
-          href="https://fonts.gstatic.com" 
-          crossOrigin="anonymous"  // Changed from "true" to "anonymous"
-        />
-        <link 
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" 
-          rel="stylesheet" 
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Add other meta tags as needed */}
-      </>
-    );
-  }
+  return (
+    <>
+      <title>DingerZone - Backyard to Big Leagues</title>
+      <meta name="description" content="Record, get AI tips, and show off to coaches with DingerZone." />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+      <link rel="apple-touch-icon" href="/icon.png" />
+    </>
+  );
+}
   
