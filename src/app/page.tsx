@@ -2,6 +2,7 @@
 "use client";
 
 import Header from '../components/Header';
+import Footer from '@/components/Footer';
 // import batter from '../../public/assets/images/extension_swing_keypoints.png';
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -448,7 +449,8 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6">
+      <Footer />
+      {/* <footer className="bg-gray-100 py-6">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-600">&copy; DingerZone 2025</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
@@ -463,7 +465,7 @@ export default function LandingPage() {
             </a>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
