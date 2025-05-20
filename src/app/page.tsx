@@ -2,18 +2,26 @@
 "use client";
 
 import Header from '../components/Header';
-// import batter from '../../public/assets/images/extension_swing_keypoints.png';
-import React, { useState } from 'react';
+import Footer from '../components/Footer';
 import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'Player' | 'Parent' | 'Coach'>('Player');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const tabs: ('Player' | 'Parent' | 'Coach')[] = ['Player', 'Parent', 'Coach'];
 
-  const getStatedClick = () => {
-    window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent('DingerZone Subscription')}`;
-  };
+  // Handle scrolling to section based on URL hash
+  useEffect(() => {
+    const hash = window.location.hash; // e.g., #about-section
+    if (hash) {
+      const sectionId = hash.replace('#', '');
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []); // Run once on mount
 
   type BenefitType = {
     Player: string[];
@@ -100,14 +108,13 @@ export default function LandingPage() {
               backgroundImage: "url('/assets/images/extension_swing_keypoints.png')",
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
-              // backgroundPosition: 'left',
               backgroundPosition: '35%',
               width: '150%',
               height: '150%',
               right: '-10%',
               top: '-10%',
               transform: 'rotate(5deg)',
-              filter: 'hue-rotate(340deg) saturate(1.5)', // Change hue and saturation
+              filter: 'hue-rotate(340deg) saturate(1.5)',
             }}
           />
 
@@ -115,7 +122,6 @@ export default function LandingPage() {
           <div className="absolute z-30 right-0 inset-y-0 w-2/3 flex flex-col justify-center items-end pr-24">
             <div className="text-right">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 drop-shadow-lg">
-              {/* Crush Your Swing! */}
                 Backyard to Big Leagues
               </h1>
               <p className="text-xl md:text-4xl text-white font-medium drop-shadow-lg">
@@ -124,29 +130,11 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-
         </div>
       </section>
 
       {/* Main Content */}
       <section id="benefits-section" className="container mx-auto flex flex-col lg:flex-row py-12 px-6 bg-white">
-      {/* <main className="container mx-auto flex flex-col lg:flex-row py-12 px-6 flex-grow relative z-30 bg-white"> */}
-        {/* <div className="lg:w-1/2 flex flex-col space-y-4">
-          <img
-            src="/assets/images/login_profile_3d.png"
-            alt="Login Screenshot"
-            width={200}
-            
-            // className="rounded shadow-md"
-          />
-          <img
-            src="/path-to-screenshot2.jpg"
-            alt="App Screenshot 2"
-            className="rounded shadow-md"
-          />
-        </div> */}
-
-        {/* Option 2: Overlapping Images with Custom Positioning */}
         <div className="lg:w-1/2 relative h-[400px] flex items-center justify-center">
           <Image
             src="/assets/images/allhits_screen_3d.png"
@@ -185,56 +173,6 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* <div className="lg:w-1/2 lg:pl-12 mt-8 lg:mt-0">
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">Why You'll Love Our App</h2>
-          <div className="flex space-x-4 mb-6">
-            {['Player', 'Parent', 'Coach'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex items-center px-4 py-2 rounded-full font-semibold text-sm transition-colors ${
-                  activeTab === tab
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                <span className="mr-2">
-                  {tab === 'Player' && (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l9-2V6l-9 2V20zM3 18V6l9 2v12l-9-2z" />
-                    </svg>
-                  )}
-                  {tab === 'Parent' && (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-7 8c0-2.21 1.79-4 4-4h6c2.21 0 4 1.79 4 4H5z" />
-                    </svg>
-                  )}
-                  {tab === 'Coach' && (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
-                </span>
-                {tab}
-              </button>
-            ))}
-          </div>
-          <ul className="list-disc pl-5 space-y-4 text-lg text-gray-700">
-            {benefits[activeTab].map((benefit, index) => (
-              <li key={index}>{benefit}</li>
-            ))}
-          </ul>
-          <div className="mt-6">
-            <a
-              href="https://apps.apple.com/your-app-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Download on the App Store
-            </a>
-          </div>
-        </div> */}
         <div className="lg:w-1/2 lg:pl-12 mt-8 lg:mt-0">
           <h2 className="text-3xl font-bold mb-4 text-gray-800">Hits for the whole LineUp: <br /> Players, Parents, and Coaches</h2>
           <div className="flex space-x-4 mb-6">
@@ -247,12 +185,6 @@ export default function LandingPage() {
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
-                // className={`flex items-center px-4 py-2 rounded-full font-semibold text-sm transition-colors ${
-                //   activeTab === tab
-                //     ? 'text-white'
-                //     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                // }`}
-                // style={activeTab === tab ? { backgroundColor: '#1A1A2E' } : {}}
               >
                 <span className="mr-2">
                   {tab === 'Player' && (
@@ -261,7 +193,6 @@ export default function LandingPage() {
                       alt="Player Icon"
                       width={20}
                       height={20}
-                      // className="w-5 h-5"
                       className={`w-5 h-5 ${activeTab === tab ? 'filter brightness-0 invert' : ''}`}
                     />
                   )}
@@ -271,7 +202,6 @@ export default function LandingPage() {
                       alt="Parent Icon"
                       width={20}
                       height={20}
-                      // className="w-5 h-5"
                       className={`w-5 h-5 ${activeTab === tab ? 'filter brightness-0 invert' : ''}`}
                     />
                   )}
@@ -281,7 +211,6 @@ export default function LandingPage() {
                       alt="Coach Icon"
                       width={20}
                       height={20}
-                      // className="w-5 h-5"
                       className={`w-5 h-5 ${activeTab === tab ? 'filter brightness-0 invert' : ''}`}
                     />
                   )}
@@ -297,10 +226,6 @@ export default function LandingPage() {
           </ul>
           <div className="mt-6">
             <a
-              // Uncomment below link when able to download in app store
-              // href="https://apps.apple.com/your-app-link"
-              // target="_blank"
-              // rel="noopener noreferrer"
               className="inline-block px-6 py-3 bg-gray-600 text-white rounded-3xl hover:bg-gray-800"
             >
               Download on the App Store (Coming Soon)
@@ -308,38 +233,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {/* </main> */}
-
-      {/* Subscriptions Section // Uncomment when implementing subscriptions
-      <section id="subscriptions-section" className="container mx-auto py-12 px-6 bg-gray-100">
-        <h2 className="text-3xl font-bold mb-4 text-gray-800">Subscriptions: Choose Your Plan</h2>
-        <p className="text-lg text-gray-700 mb-6">
-          Unlock premium features with our flexible plans, including family accounts and coach access.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Player</h3>
-            <p className="text-gray-600">Manage the whole family<br /> Share with Teams and Coaches. <br /> Unlimited AI Feedback & Tips </p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800" onClick={getStatedClick}>
-              Get Started
-            </button>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Coach</h3>
-            <p className="text-gray-600">Access players’ swings and stats.<br /> Give feedback and assign drills.<br /><br /></p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-800" onClick={getStatedClick}>
-              Get Started
-            </button>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Trainer (Coming Soon)</h3>
-            <p className="text-gray-600">Unlimited connections. <br /> Grow your lineup. <br /> Custom models tailored to you.</p>
-            <button className="mt-4 px-4 py-2 bg-gray-600 text-white rounded-3xl hover:bg-blue-800">
-              Coming Soon
-            </button>
-          </div>
-        </div>
-      </section> */}
 
       {/* About Section */}
       <section id="about-section" className="container mx-auto py-12 px-6 bg-white">
@@ -362,34 +255,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Latest News Section
-      <section id="latest-news-section" className="container mx-auto py-12 px-6 bg-gray-100">
-        <h2 className="text-3xl font-bold mb-4 text-gray-800">Latest News</h2>
-        <p className="text-lg text-gray-700 mb-6">
-          Stay updated with DingerZone’s new features, tips, and community stories.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">New AI Drill Recommendations</h3>
-            <p className="text-gray-600">
-              Our latest update includes personalized drill videos tailored to your swing.
-            </p>
-            <a href="#" className="mt-4 inline-block text-blue-600 hover:underline">
-              Read More
-            </a>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold mb-2">Community Spotlight</h3>
-            <p className="text-gray-600">
-              Meet Jake, a high school player who improved his swing with DingerZone.
-            </p>
-            <a href="#" className="mt-4 inline-block text-blue-600 hover:underline">
-              Read More
-            </a>
-          </div>
-        </div>
-      </section> */}
 
       {/* FAQ Section */}
       <section id="faq-section" className="container mx-auto py-12 px-6 bg-gray-100">
@@ -441,29 +306,11 @@ export default function LandingPage() {
               feedback@dingerzone.ai
             </a>
           </p>
-          {/* <button className="px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-700">
-            Contact Support
-          </button> */}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-600">&copy; DingerZone 2025</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <a href="#" className="text-gray-600 hover:text-gray-900">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
-              Terms of Service
-            </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900" onClick={getStatedClick}>
-              Contact
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
