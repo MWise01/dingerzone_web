@@ -15,7 +15,7 @@ export default function PrivacyPolicy() {
           <strong>Effective Date:</strong> May 19, 2025
         </p>
         <p className="text-lg text-gray-600 mb-6">
-          DingerZone ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application ("App") and website (https://www.dingerzone.com). The App enables youth baseball players, parents, and coaches to analyze swing mechanics using AI-powered computer vision and collaborate on team improvements.
+          DingerZone (“we,” “us,” or “our”) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application (“App”) and website (https://www.dingerzone.com). The App enables youth baseball players, parents, and coaches to analyze swing mechanics using AI-powered computer vision and collaborate on team improvements.
         </p>
 
         <section className="mb-8">

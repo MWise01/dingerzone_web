@@ -22,10 +22,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     // </html>
     <html lang="en">
       <head>
-        <link
+        <title>DingerZone</title>
+        <meta name="description" content="Baseball swing analysis powered by AI" />
+        <link rel="icon" href="/favicon.ico" />
+        {/* <link
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
           rel="stylesheet"
-        />
+        /> */}
       </head>
       <body className={inter.className}>{children}</body>
     </html>

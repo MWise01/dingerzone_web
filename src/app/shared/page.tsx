@@ -1,8 +1,9 @@
+// /src/app/shared/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios'; // Import AxiosError
 import Image from 'next/image';
 // import styles from './Shared.module.css';
 import styles from '../shared/[shareId]/Shared.module.css'
@@ -38,8 +39,16 @@ export default function SharedVideoPage() {
           { headers: { 'Content-Type': 'application/json' } }
         );
         setVideoDetails(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.error || 'Failed to load video');
+      } catch (err: unknown) {
+        // Type guard to check if err is an AxiosError
+        if (err instanceof AxiosError) {
+          setError(
+            (err.response?.data as { error?: string })?.error || 'Failed to load video'
+          );
+        } else {
+          // Handle non-Axios errors
+          setError('An unexpected error occurred');
+        }
       }
     };
 
