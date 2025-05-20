@@ -11,10 +11,6 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const tabs: ('Player' | 'Parent' | 'Coach')[] = ['Player', 'Parent', 'Coach'];
 
-  const getStatedClick = () => {
-    window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent('DingerZone Subscription')}`;
-  };
-
   // Handle scrolling to section based on URL hash
   useEffect(() => {
     const hash = window.location.hash; // e.g., #about-section
