@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import Image from 'next/image';
 import styles from './Shared.module.css';
 
@@ -72,49 +72,49 @@ export default function SharedVideoPage() {
   // }, [shareId]);
 
   useEffect(() => {
-  if (!shareId) {
-    console.error('No shareId provided in URL');
-    setError('Invalid share link');
-    return;
-  }
-
-  const fetchVideoDetails = async () => {
-    const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/get-shared-video-details`;
-    const requestBody = { shareId };
-    console.log('Preparing API request:', {
-      url: apiUrl,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: requestBody,
-    });
-
-    try {
-      const response = await axios.post(apiUrl, requestBody, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      console.log('API response:', {
-        status: response.status,
-        data: response.data,
-      });
-      setVideoDetails(response.data);
-    } catch (err: AxiosError) {
-      console.error('API error:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-        config: {
-          url: err.config?.url,
-          method: err.config?.method,
-          headers: err.config?.headers,
-          data: err.config?.data,
-        },
-      });
-      setError(err.response?.data?.error || 'Failed to load video');
+    if (!shareId) {
+      console.error('No shareId provided in URL');
+      setError('Invalid share link');
+      return;
     }
-  };
 
-  fetchVideoDetails();
-}, [shareId]);
+    const fetchVideoDetails = async () => {
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/get-shared-video-details`;
+      const requestBody = { shareId };
+      console.log('Preparing API request:', {
+        url: apiUrl,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: requestBody,
+      });
+
+      try {
+        const response = await axios.post(apiUrl, requestBody, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        console.log('API response:', {
+          status: response.status,
+          data: response.data,
+        });
+        setVideoDetails(response.data);
+      } catch (err: AxiosError) {
+        console.error('API error:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message,
+          config: {
+            url: err.config?.url,
+            method: err.config?.method,
+            headers: err.config?.headers,
+            data: err.config?.data,
+          },
+        });
+        setError(err.response?.data?.error || 'Failed to load video');
+      }
+    };
+
+    fetchVideoDetails();
+  }, [shareId]);
 
   if (error) {
     return (
