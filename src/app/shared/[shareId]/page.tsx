@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import Image from 'next/image';
 import styles from './Shared.module.css';
 
