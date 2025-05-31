@@ -93,7 +93,7 @@ export default function SharedVideoPage() {
         <Image src="/logo.png" alt="DingerZone Logo" width={150} height={50} />
       </header>
       <main className={styles.main}>
-        <h1>{videoDetails.playerName}'s Swing Analysis</h1>
+        <h1>{`${videoDetails.playerName}'s Swing Analysis`}</h1>
         <div className={styles.videoContainer}>
           <video
             src={isSkeleton && videoDetails.skeletonUrl ? videoDetails.skeletonUrl : videoDetails.videoUrl}
