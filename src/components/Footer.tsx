@@ -14,9 +14,9 @@ export default function Footer() {
           <a href="/privacy" className="text-gray-600 hover:text-gray-900">
             Privacy Policy
           </a>
-          {/* <a href="/terms" className="text-gray-600 hover:text-gray-900">
+          <a href="/terms" className="text-gray-600 hover:text-gray-900">
             Terms of Service
-          </a> */}
+          </a>
           <a href="#" className="text-gray-600 hover:text-gray-900" onClick={getStartedClick}>
             Contact
           </a>
