@@ -2,10 +2,8 @@
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-// import Header from '../components/Header';
-import Header from '@/components/Header';
-// import Footer from '../components/Footer';
-import Footer from '@/components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 export default function SubscriptionSuccess() {
   const searchParams = useSearchParams();
