@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react'; // Add Suspense import
 import { useSearchParams } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
-export default function SubscriptionSuccess() {
+function SubscriptionSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id'); // Optional: Can use to verify session if needed
 
@@ -30,7 +30,7 @@ export default function SubscriptionSuccess() {
             If you were subscribing from the app, you can now return to it to see your updated status. Refresh the subscription screen if needed.
           </p>
           <a
-            href="dingerzone://subscription-success" // Replace 'dingerzone://' with your actual app deep link scheme (e.g., your-app-scheme://refresh-sub)
+            href="dingerzone://subscription-success" // Your app's deep link scheme
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-800"
           >
             Return to DINGERZONE App
@@ -42,6 +42,14 @@ export default function SubscriptionSuccess() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function SubscriptionSuccess() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SubscriptionSuccessContent />
+    </Suspense>
   );
 }
 
