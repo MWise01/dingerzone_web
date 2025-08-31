@@ -125,7 +125,7 @@ export default function LandingPage() {
                 Pro-Level Baseball Coaching Anywhere, Anytime
               </h1>
               <p className="text-xl md:text-3xl text-white font-medium drop-shadow-lg">
-                Don't whiff on hitting your potential<br /> 
+                Don&apos;t whiff on hitting your potential<br /> 
                 Record, Get AI Tips, and Show Off to Coaches
               </p>
             </div>
