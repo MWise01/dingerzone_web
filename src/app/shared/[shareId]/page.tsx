@@ -134,7 +134,7 @@ export default function SharedVideoPage() {
           {/* User Info */}
           <div className="bg-gray-800 p-4 rounded-lg mb-4 flex items-center">
             <Image
-              src="/default-profile.png"
+              src="/assets/images/Baseball.png"
               alt="User Profile"
               width={40}
               height={40}

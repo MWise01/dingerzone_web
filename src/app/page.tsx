@@ -121,12 +121,12 @@ export default function LandingPage() {
           {/* Header Text Overlay */}
           <div className="absolute z-30 right-0 inset-y-0 w-2/3 flex flex-col justify-center items-end pr-24">
             <div className="text-right">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 drop-shadow-lg">
-                Backyard to Big Leagues
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 drop-shadow-lg">
+                Pro-Level Baseball Coaching Anywhere, Anytime
               </h1>
-              <p className="text-xl md:text-4xl text-white font-medium drop-shadow-lg">
-                Record, Get AI Tips,<br /> 
-                and Show Off to Coaches
+              <p className="text-xl md:text-3xl text-white font-medium drop-shadow-lg">
+                Don&apos;t whiff on hitting your potential<br /> 
+                Record, Get AI Tips, and Show Off to Coaches
               </p>
             </div>
           </div>
