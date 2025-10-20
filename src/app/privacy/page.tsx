@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2 text-gray-600">
             <li><strong>Personal Information:</strong> When you create an account, we collect your name, email address, and, for parents, information about child players (e.g., player names, ages).</li>
             <li><strong>Video Content:</strong> Users may upload videos of baseball swings, which are stored and processed to provide AI-driven feedback.</li>
-            <li><strong>Payment Information:</strong> Subscription payments are processed via Stripe, which collects and stores payment details (e.g., credit card information). We do not store payment information directly.</li>
+            <li><strong>Payment Information:</strong> Subscription payments are processed via Apple In-App-Payment IAP or Stripe, which may collect and stores payment details (e.g., credit card information). We do not store payment information directly.</li>
             <li><strong>Usage Data:</strong> We collect data on how you interact with the App, such as features used, video uploads, and team interactions.</li>
             <li><strong>Device Information:</strong> We collect device details (e.g., device type, operating system, IP address) to optimize App performance.</li>
           </ul>
@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
             <li>Authenticate users via AWS Cognito and manage accounts.</li>
             <li>Store videos securely in AWS S3 and process data in AWS DynamoDB.</li>
             <li>Send transactional emails (e.g., account confirmations, subscription updates) via AWS SES.</li>
-            <li>Process payments securely through Stripe for premium subscriptions.</li>
+            <li>Process payments securely through Apple IAP or Stripe for premium subscriptions.</li>
             <li>Analyze usage to enhance App performance and user experience.</li>
           </ul>
         </section>
@@ -47,8 +47,9 @@ export default function PrivacyPolicy() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. How We Share Your Information</h2>
           <p className="text-gray-600 mb-4">We share your information only in the following cases:</p>
           <ul className="list-disc pl-6 space-y-2 text-gray-600">
-            <li><strong>With Coaches:</strong> If a player joins a team, their swing videos and related data are accessible to the team’s coach for a pre-determined period.</li>
-            <li><strong>Service Providers:</strong> We use third-party services like AWS (for hosting, storage, and authentication) and Stripe (for payments). These providers process data on our behalf and are bound by strict confidentiality agreements.</li>
+            {/* <li><strong>With Coaches:</strong> If a player joins a team, their swing videos and related data are accessible to the team’s coach for a pre-determined period.</li> */}
+            <li><strong>With Coaches:</strong> If a player joins a team, their swing videos and related data are accessible to the team&apos;s coach for a pre-determined period.</li>
+            <li><strong>Service Providers:</strong> We use third-party services like AWS (for hosting, storage, and authentication), Apple In-App-Payments and Stripe (for payments). These providers process data on our behalf and are bound by strict confidentiality agreements.</li>
             <li><strong>Legal Requirements:</strong> We may disclose information if required by law or to protect our rights, safety, or property.</li>
           </ul>
         </section>
@@ -56,14 +57,14 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Data Security</h2>
           <p className="text-gray-600">
-            We use industry-standard security measures, including encryption for data in transit and at rest, to protect your information. AWS services (Cognito, S3, DynamoDB) and Stripe comply with high security standards. However, no system is completely secure, and we cannot guarantee absolute security.
+            We use industry-standard security measures, including encryption for data in transit and at rest, to protect your information. AWS services (Cognito, S3, DynamoDB), Apple, and Stripe comply with high security standards. However, no system is completely secure, and we cannot guarantee absolute security.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Children’s Privacy</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Children&apos;s Privacy</h2>
           <p className="text-gray-600">
-            The App allows parents to create profiles for child players under 13. We comply with the Children’s Online Privacy Protection Act (COPPA) by obtaining verifiable parental consent before collecting personal information from children. Parents control their child’s data and can request deletion at any time.
+            The App allows parents to create profiles for child players under 13. We comply with the Children’s Online Privacy Protection Act (COPPA) by obtaining verifiable parental consent before collecting personal information from children. Parents control their child&apos;s data and can request deletion at any time.
           </p>
         </section>
 
@@ -80,7 +81,7 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Third-Party Links</h2>
           <p className="text-gray-600">
-            The App or website may link to third-party services (e.g., Stripe). We are not responsible for their privacy practices. Please review their policies.
+            The App or website may link to third-party services (e.g., AWS, Stripe). We are not responsible for their privacy practices. Please review their policies.
           </p>
         </section>
 
