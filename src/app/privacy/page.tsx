@@ -34,7 +34,7 @@ export default function PrivacyPolicy() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. How We Use Your Information</h2>
           <p className="text-gray-600 mb-4">We use your information to:</p>
           <ul className="list-disc pl-6 space-y-2 text-gray-600">
-            <li>Provide and improve the App’s core features, including AI swing analysis, video processing, and team collaboration.</li>
+            <li>Provide and improve the App&apos;s core features, including AI swing analysis, video processing, and team collaboration.</li>
             <li>Authenticate users via AWS Cognito and manage accounts.</li>
             <li>Store videos securely in AWS S3 and process data in AWS DynamoDB.</li>
             <li>Send transactional emails (e.g., account confirmations, subscription updates) via AWS SES.</li>
@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Children&apos;s Privacy</h2>
           <p className="text-gray-600">
-            The App allows parents to create profiles for child players under 13. We comply with the Children’s Online Privacy Protection Act (COPPA) by obtaining verifiable parental consent before collecting personal information from children. Parents control their child&apos;s data and can request deletion at any time.
+            The App allows parents to create profiles for child players under 13. We comply with the Children&apos;s Online Privacy Protection Act (COPPA) by obtaining verifiable parental consent before collecting personal information from children. Parents control their child&apos;s data and can request deletion at any time.
           </p>
         </section>
 
