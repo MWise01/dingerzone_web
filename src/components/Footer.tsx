@@ -22,6 +22,9 @@ export default function Footer() {
           <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" className="text-gray-600 hover:text-gray-900">
             EULA
           </a>
+          <a href="#" className="text-gray-600 hover:text-gray-900" onClick={getStartedClick}>
+            Contact
+          </a>
           <a
             href="https://apple.co/3Js2maF"
             className="inline-block"
