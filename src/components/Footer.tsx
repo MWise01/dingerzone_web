@@ -1,6 +1,8 @@
 // src/components/Footer.tsx
 'use client';
 
+import Image from "next/image";
+
 export default function Footer() {
   const getStartedClick = () => {
     window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent('DingerZone Subscription')}`;
@@ -20,8 +22,17 @@ export default function Footer() {
           <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" className="text-gray-600 hover:text-gray-900">
             EULA
           </a>
-          <a href="#" className="text-gray-600 hover:text-gray-900" onClick={getStartedClick}>
-            Contact
+          <a
+            href="https://apple.co/3Js2maF"
+            className="inline-block"
+          >
+            <Image
+              src="/assets/images/appstore_black.svg"
+              alt="Download on the App Store"
+              width={120}
+              height={40}
+              className="hover:opacity-80 transition-opacity"
+            />
           </a>
         </div>
       </div>

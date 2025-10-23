@@ -225,11 +225,25 @@ export default function LandingPage() {
             ))}
           </ul>
           <div className="mt-6">
-            <a
+            {/* <a
               className="inline-block px-6 py-3 bg-gray-600 text-white rounded-3xl hover:bg-gray-800"
             >
               Download on the App Store (Coming Soon)
-            </a>
+            </a> */}
+            <div className="mt-6">
+              <a
+                href="https://apple.co/3Js2maF"
+                className="inline-block"
+              >
+                <Image
+                  src="/assets/images/appstore_black.svg"
+                  alt="Download on the App Store"
+                  width={120}
+                  height={40}
+                  className="hover:opacity-80 transition-opacity"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </section>

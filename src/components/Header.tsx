@@ -57,6 +57,18 @@ export default function Header() {
           >
             Contact Us
           </button>
+          <a
+            href="https://apple.co/3Js2maF"
+            className="ml-4 inline-block"
+          >
+            <Image
+              src="/assets/images/appstore_black.svg"
+              alt="Download on the App Store"
+              width={120}
+              height={40}
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
         </nav>
 
         {/* Mobile Hamburger Button */}
@@ -111,6 +123,18 @@ export default function Header() {
           >
             Contact Us
           </button>
+          <a
+            href="https://apple.co/3Js2maF"
+            className="inline-block"
+          >
+            <Image
+              src="/assets/images/appstore_black.svg"
+              alt="Download on the App Store"
+              width={120}
+              height={40}
+              className="hover:opacity-80 transition-opacity"
+            />
+          </a>
         </nav>
       )}
     </header>
