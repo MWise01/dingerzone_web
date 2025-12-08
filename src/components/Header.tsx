@@ -1,26 +1,72 @@
-// src/components/Header.tsx
 "use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
 
 const navItems = [
-  { name: 'Home', sectionId: 'home-section' },
-  { name: 'About', sectionId: 'about-section' },
-  { name: 'FAQ', sectionId: 'faq-section' },
+  { name: "Home", href: "/#home-section" },
+  { name: "About", href: "/#about-section" },
+  { name: "FAQ", href: "/#faq-section" },
+  { name: "Getting Started", href: "/getting-started" }, // separate page
 ];
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleFeedbackClick = () => {
-    window.location.href = 'mailto:feedback@dingerzone.ai';
+    window.location.href = "mailto:feedback@dingerzone.ai";
+  };
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    href: string,
+    closeMenu: boolean
+  ) => {
+    // Only care about in-page anchors like "/#about-section"
+    if (href.startsWith("/#")) {
+      const id = href.substring(2); // "/#faq-section" -> "faq-section"
+
+      // CASE 1: Already on home page → smooth scroll
+      if (pathname === "/") {
+        e.preventDefault();
+        const element = document.getElementById(id);
+
+        if (element) {
+          const yOffset = -80; // adjust for sticky header height
+          const y =
+            element.getBoundingClientRect().top +
+            window.pageYOffset +
+            yOffset;
+
+          window.scrollTo({
+            top: y,
+            behavior: "smooth",
+          });
+
+          // Update URL hash without a full navigation
+          window.history.pushState({}, "", href);
+        }
+
+        if (closeMenu) setIsMenuOpen(false);
+        return;
+      }
+
+      // CASE 2: On a different page (e.g., /getting-started)
+      // → let Next.js handle normal navigation to "/#section"
+      if (closeMenu) setIsMenuOpen(false);
+      return; // do NOT call preventDefault; Link will navigate
+    }
+
+    // Non-hash routes like "/getting-started"
+    if (closeMenu) setIsMenuOpen(false);
   };
 
   return (
@@ -28,12 +74,7 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
         {/* Logo and Site Title */}
         <Link href="/" className="flex items-center">
-          <Image
-            src={Logo}
-            width={60}
-            height={60}
-            alt="DingerZone Logo"
-          />
+          <Image src={Logo} width={60} height={60} alt="DingerZone Logo" />
           <span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold px-4 sm:px-6 md:px-8">
             DingerZone
           </span>
@@ -44,9 +85,9 @@ export default function Header() {
           {navItems.map((item) => (
             <Link
               key={item.name}
-              href={`/#${item.sectionId}`}
+              href={item.href}
               className="text-white hover:text-gray-200 text-sm lg:text-base font-normal"
-              onClick={() => setIsMenuOpen(false)} // Close mobile menu if open
+              onClick={(e) => handleNavClick(e, item.href, false)}
             >
               {item.name}
             </Link>
@@ -57,10 +98,7 @@ export default function Header() {
           >
             Contact Us
           </button>
-          <a
-            href="https://apple.co/3Js2maF"
-            className="ml-4 inline-block"
-          >
+          <a href="https://apple.co/3Js2maF" className="ml-4 inline-block">
             <Image
               src="/assets/images/appstore_black.svg"
               alt="Download on the App Store"
@@ -75,7 +113,7 @@ export default function Header() {
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={toggleMenu}
-          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMenuOpen}
         >
           <svg
@@ -110,23 +148,31 @@ export default function Header() {
           {navItems.map((item) => (
             <Link
               key={item.name}
-              href={`/#${item.sectionId}`}
+              href={item.href}
               className="text-white hover:text-gray-200 text-lg font-normal"
-              onClick={() => setIsMenuOpen(false)} // Close menu on click
+              onClick={(e) => {
+                // For mobile, we also want smooth scroll if already on home
+                // and normal navigation otherwise:
+                handleNavClick(e, item.href, true);
+
+                // If we're on home and just smooth-scrolled,
+                // handleNavClick already closed the menu.
+                // If we're navigating to "/", Next will change the page.
+              }}
             >
               {item.name}
             </Link>
           ))}
           <button
             className="px-4 py-1 bg-orange-600 text-white font-bold rounded-3xl hover:bg-gray-500 text-lg"
-            onClick={handleFeedbackClick}
+            onClick={() => {
+              setIsMenuOpen(false);
+              handleFeedbackClick();
+            }}
           >
             Contact Us
           </button>
-          <a
-            href="https://apple.co/3Js2maF"
-            className="inline-block"
-          >
+          <a href="https://apple.co/3Js2maF" className="inline-block">
             <Image
               src="/assets/images/appstore_black.svg"
               alt="Download on the App Store"
@@ -140,6 +186,155 @@ export default function Header() {
     </header>
   );
 }
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+// // src/components/Header.tsx
+// "use client";
+
+// import { useState } from 'react';
+// import Image from 'next/image';
+// import Link from 'next/link';
+// import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
+
+// const navItems = [
+//   { name: 'Home', sectionId: 'home-section' },
+//   { name: 'About', sectionId: 'about-section' },
+//   { name: 'FAQ', sectionId: 'faq-section' },
+// ];
+
+// export default function Header() {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+//   const toggleMenu = () => {
+//     setIsMenuOpen(!isMenuOpen);
+//   };
+
+//   const handleFeedbackClick = () => {
+//     window.location.href = 'mailto:feedback@dingerzone.ai';
+//   };
+
+//   return (
+//     <header className="bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg">
+//       <div className="container mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+//         {/* Logo and Site Title */}
+//         <Link href="/" className="flex items-center">
+//           <Image
+//             src={Logo}
+//             width={60}
+//             height={60}
+//             alt="DingerZone Logo"
+//           />
+//           <span className="text-white text-2xl sm:text-3xl md:text-4xl font-bold px-4 sm:px-6 md:px-8">
+//             DingerZone
+//           </span>
+//         </Link>
+
+//         {/* Desktop Navigation */}
+//         <nav className="hidden md:flex items-center space-x-4 lg:space-x-6">
+//           {navItems.map((item) => (
+//             <Link
+//               key={item.name}
+//               href={`/#${item.sectionId}`}
+//               className="text-white hover:text-gray-200 text-sm lg:text-base font-normal"
+//               onClick={() => setIsMenuOpen(false)} // Close mobile menu if open
+//             >
+//               {item.name}
+//             </Link>
+//           ))}
+//           <button
+//             className="ml-4 px-4 py-1 bg-orange-600 text-white font-bold rounded-3xl hover:bg-gray-500"
+//             onClick={handleFeedbackClick}
+//           >
+//             Contact Us
+//           </button>
+//           <a
+//             href="https://apple.co/3Js2maF"
+//             className="ml-4 inline-block"
+//           >
+//             <Image
+//               src="/assets/images/appstore_black.svg"
+//               alt="Download on the App Store"
+//               width={120}
+//               height={40}
+//               className="hover:opacity-80 transition-opacity"
+//             />
+//           </a>
+//         </nav>
+
+//         {/* Mobile Hamburger Button */}
+//         <button
+//           className="md:hidden text-white focus:outline-none"
+//           onClick={toggleMenu}
+//           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+//           aria-expanded={isMenuOpen}
+//         >
+//           <svg
+//             className="w-6 h-6"
+//             fill="none"
+//             stroke="currentColor"
+//             viewBox="0 0 24 24"
+//             xmlns="http://www.w3.org/2000/svg"
+//           >
+//             {isMenuOpen ? (
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth="2"
+//                 d="M6 18L18 6M6 6l12 12"
+//               />
+//             ) : (
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth="2"
+//                 d="M4 6h16M4 12h16M4 18h16"
+//               />
+//             )}
+//           </svg>
+//         </button>
+//       </div>
+
+//       {/* Mobile Navigation Drawer */}
+//       {isMenuOpen && (
+//         <nav className="md:hidden bg-blue-600 px-4 py-6 flex flex-col space-y-4">
+//           {navItems.map((item) => (
+//             <Link
+//               key={item.name}
+//               href={`/#${item.sectionId}`}
+//               className="text-white hover:text-gray-200 text-lg font-normal"
+//               onClick={() => setIsMenuOpen(false)} // Close menu on click
+//             >
+//               {item.name}
+//             </Link>
+//           ))}
+//           <button
+//             className="px-4 py-1 bg-orange-600 text-white font-bold rounded-3xl hover:bg-gray-500 text-lg"
+//             onClick={handleFeedbackClick}
+//           >
+//             Contact Us
+//           </button>
+//           <a
+//             href="https://apple.co/3Js2maF"
+//             className="inline-block"
+//           >
+//             <Image
+//               src="/assets/images/appstore_black.svg"
+//               alt="Download on the App Store"
+//               width={120}
+//               height={40}
+//               className="hover:opacity-80 transition-opacity"
+//             />
+//           </a>
+//         </nav>
+//       )}
+//     </header>
+//   );
+// }
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 // // src/components/Header.tsx
 // "use client";
