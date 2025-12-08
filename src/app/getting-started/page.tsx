@@ -285,7 +285,7 @@ const GettingStartedAndAdvancedGuide: React.FC = () => {
                     <div className="tip-box">
                       Use clear names like{" "}
                       <strong>&quot;Club – Age – Season&quot;</strong> (e.g.,
-                      &quot;NOVA Premier 14U – Spring 2026&quot;) so everyone
+                      &quot;DingerZ 14U – Spring 2028&quot;) so everyone
                       knows exactly which team to join.
                     </div>
                     <div className="chip-row">
