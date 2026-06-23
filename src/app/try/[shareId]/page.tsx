@@ -1,0 +1,360 @@
+'use client';
+
+import Header from '../../../components/Header';
+import Footer from '../../../components/Footer';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ScorecardMetric,
+  TrialVideoDetails,
+  fetchTrialVideoDetails,
+} from '../../../lib/trialApi';
+
+const POLL_INTERVAL_MS = 10000;
+
+const metricLabels: Record<string, string> = {
+  handPath: 'Hand Path',
+  stride: 'Stride',
+  headPosition: 'Head Position',
+  hipRotation: 'Hip Rotation',
+  shoulderHipHandTiming: 'Shoulder, Hip, Hand Timing',
+  followThrough: 'Follow Through',
+  powerGeneration: 'Power Generation',
+};
+
+const metricCriteria: Record<string, string> = {
+  handPath: 'How efficiently the hands move to the ball, stay connected, and avoid casting or looping away from the swing path.',
+  stride: 'How the hitter loads and lands, including balance, timing, direction, and whether the stride supports an athletic launch position.',
+  headPosition: 'How steady the head and eyes remain through load, launch, contact, and follow-through.',
+  hipRotation: 'How well the hips initiate and rotate through the swing while maintaining control and direction.',
+  shoulderHipHandTiming: 'How the lower body, torso, and hands sequence together so energy transfers cleanly into the barrel.',
+  followThrough: 'How the hitter finishes the swing with extension, balance, and a complete path through the hitting zone.',
+  powerGeneration: 'How effectively the swing creates and transfers force from the ground through the body into the bat.',
+};
+
+const formatDateTime = (value?: string | null) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
+const formatMetricLabel = (key: string) =>
+  metricLabels[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase());
+
+const cleanSummaryFeedback = (summary: string) =>
+  summary
+    .replace(/^(summaryFeedback|summary feedback)\s*:\s*/i, '')
+    .replace(/\n(summaryFeedback|summary feedback)\s*:\s*/gi, '\n')
+    .trim();
+
+const clampPercent = (score: number) => Math.min(100, Math.max(0, (score / 5) * 100));
+
+const getAverageScore = (scorecard: Record<string, ScorecardMetric> | null) => {
+  if (!scorecard) return null;
+  const scores = Object.values(scorecard)
+    .map((metric) => Number(metric.score))
+    .filter((score) => Number.isFinite(score));
+
+  if (!scores.length) return null;
+
+  return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+};
+
+export default function TrialResultPage() {
+  const params = useParams();
+  const shareId = Array.isArray(params.shareId) ? params.shareId[0] : params.shareId;
+  const [details, setDetails] = useState<TrialVideoDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!shareId) {
+      setError('Missing trial result identifier.');
+      return;
+    }
+
+    let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const loadDetails = async () => {
+      try {
+        const nextDetails = await fetchTrialVideoDetails(shareId);
+        if (!isMounted) return;
+
+        setDetails(nextDetails);
+        setLastUpdated(new Date());
+        setError(null);
+
+        const isReady =
+          nextDetails.videoStatus === 'Processed' &&
+          Boolean(nextDetails.skeletonUrl) &&
+          Boolean(nextDetails.thumbnailUrl) &&
+          Boolean(nextDetails.aiSummary);
+
+        if (!isReady) {
+          timeoutId = setTimeout(loadDetails, POLL_INTERVAL_MS);
+        }
+      } catch (detailsError) {
+        if (!isMounted) return;
+        setError(
+          detailsError instanceof Error
+            ? detailsError.message
+            : 'Unable to load this trial result.'
+        );
+      }
+    };
+
+    loadDetails();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [shareId]);
+
+  const scoreEntries = useMemo(
+    () => Object.entries(details?.aiScorecard || {}),
+    [details?.aiScorecard]
+  );
+  const averageScore = getAverageScore(details?.aiScorecard || null);
+  const isProcessed = details?.videoStatus === 'Processed';
+  const hasSkeleton = Boolean(details?.skeletonUrl);
+  const activeVideoUrl = showSkeleton && details?.skeletonUrl ? details.skeletonUrl : details?.videoUrl;
+  const activeVideoType = showSkeleton && details?.skeletonUrl ? 'video/mp4' : undefined;
+  const summaryFeedback = details?.aiSummary ? cleanSummaryFeedback(details.aiSummary) : null;
+
+  return (
+    <div className="flex min-h-screen flex-col bg-gray-950 text-white">
+      <Header />
+      <main className="flex-grow">
+        <section className="border-b border-gray-800 bg-gray-900">
+          <div className="container mx-auto flex flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
+                DingerZone trial result
+              </p>
+              <h1 className="mt-1 text-3xl font-bold">Swing Analysis</h1>
+              <p className="mt-2 text-sm text-gray-300">
+                {details?.publicExpiresAt || details?.expirationTime
+                  ? `Public link expires ${formatDateTime(details.publicExpiresAt || details.expirationTime)}.`
+                  : 'Processing usually takes a few minutes.'}
+              </p>
+            </div>
+
+            <Link
+              href="/try"
+              className="inline-flex items-center justify-center rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
+            >
+              Analyze Another Swing
+            </Link>
+          </div>
+        </section>
+
+        <div className="container mx-auto px-6 py-8">
+          {error && !details && (
+            <div className="rounded-lg border border-red-800 bg-red-950 p-5 text-red-100">
+              <h2 className="mb-2 text-xl font-bold">Result unavailable</h2>
+              <p>{error}</p>
+            </div>
+          )}
+
+          {!details && !error && (
+            <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
+              <div className="h-5 w-44 animate-pulse rounded bg-gray-700" />
+              <div className="mt-4 aspect-video w-full animate-pulse rounded-lg bg-gray-800" />
+            </div>
+          )}
+
+          {details && (
+            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+              <section>
+                <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold">
+                        {details.playerName || 'Public Trial Swing'}
+                      </h2>
+                      <p className="text-sm text-gray-400">
+                        Uploaded {formatDateTime(details.uploadDate) || 'recently'}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-300">Original</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVideoError(null);
+                          setShowSkeleton((current) => !current);
+                        }}
+                        disabled={!hasSkeleton}
+                        className={`relative h-7 w-12 rounded-full transition-colors ${
+                          showSkeleton && hasSkeleton ? 'bg-blue-600' : 'bg-gray-700'
+                        } disabled:cursor-not-allowed disabled:opacity-50`}
+                        aria-label="Toggle computer vision video"
+                      >
+                        <span
+                          className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition-transform ${
+                            showSkeleton && hasSkeleton ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                      <span className="text-sm text-gray-300">Computer Vision</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-lg bg-black">
+                  {activeVideoUrl ? (
+                    <video
+                      key={activeVideoUrl}
+                      controls
+                      preload="metadata"
+                      poster={details.thumbnailUrl || undefined}
+                      playsInline
+                      className="aspect-video w-full object-contain"
+                      onError={(event) => {
+                        const mediaError = event.currentTarget.error;
+                        console.error('Video playback error', {
+                          mode: showSkeleton ? 'skeleton' : 'original',
+                          code: mediaError?.code,
+                          message: mediaError?.message,
+                          url: activeVideoUrl,
+                        });
+                        setVideoError(
+                          showSkeleton
+                            ? 'Computer vision video is not playable yet. Try switching back to Original, then retry in a moment.'
+                            : 'Original video is not playable yet. Try refreshing this result in a moment.'
+                        );
+                      }}
+                    >
+                      <source src={activeVideoUrl} type={activeVideoType} />
+                    </video>
+                  ) : (
+                    <div className="flex aspect-video items-center justify-center bg-gray-900 text-gray-400">
+                      Video is preparing...
+                    </div>
+                  )}
+                </div>
+
+                {videoError && (
+                  <div className="mt-4 rounded-lg border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-100">
+                    <p>{videoError}</p>
+                  </div>
+                )}
+
+                {!isProcessed && (
+                  <div className="mt-4 rounded-lg border border-blue-800 bg-blue-950 p-4 text-blue-100">
+                    <h2 className="font-bold">Analysis in progress</h2>
+                    <p className="mt-1 text-sm">
+                      We are checking for the processed video, thumbnail, and AI feedback every 10 seconds.
+                      {lastUpdated ? ` Last checked ${formatDateTime(lastUpdated.toISOString())}.` : ''}
+                    </p>
+                  </div>
+                )}
+              </section>
+
+              <section className="space-y-4">
+                <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <h2 className="text-xl font-bold">Overall</h2>
+                    <span className="text-lg font-bold text-orange-300">
+                      {averageScore ? `${averageScore.toFixed(1)}/5.0` : 'Pending'}
+                    </span>
+                  </div>
+                  <div className="mt-4 h-2 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-500">
+                    {averageScore && (
+                      <div
+                        className="relative h-2"
+                        style={{ width: `${clampPercent(averageScore)}%` }}
+                      >
+                        <span className="absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 translate-x-1/2 rounded-full bg-white shadow" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {summaryFeedback && (
+                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
+                    <h2 className="text-xl font-bold">Summary Feedback</h2>
+                    <p className="mt-3 whitespace-pre-line text-sm leading-6 text-gray-300">
+                      {summaryFeedback}
+                    </p>
+                  </div>
+                )}
+
+                {scoreEntries.length > 0 ? (
+                  <div className="space-y-3">
+                    {scoreEntries.map(([key, metric]) => (
+                      <div key={key} className="rounded-lg border border-gray-800 bg-gray-900 p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="relative flex items-center gap-2">
+                            <h3 className="font-bold">{formatMetricLabel(key)}</h3>
+                            <button
+                              type="button"
+                              className="group flex h-5 w-5 items-center justify-center rounded-full border border-gray-500 text-xs font-bold text-gray-300 transition-colors hover:border-blue-300 hover:text-blue-200"
+                              aria-label={`${formatMetricLabel(key)} criteria`}
+                              aria-expanded={activeInfoKey === key}
+                              onClick={() =>
+                                setActiveInfoKey((current) => (current === key ? null : key))
+                              }
+                              onBlur={() => setActiveInfoKey(null)}
+                            >
+                              i
+                              <span
+                                className={`pointer-events-none absolute left-0 top-7 z-20 w-72 rounded-md border border-gray-700 bg-gray-950 p-3 text-left text-xs font-normal leading-5 text-gray-200 shadow-xl ${
+                                  activeInfoKey === key
+                                    ? 'block'
+                                    : 'hidden group-hover:block group-focus:block'
+                                }`}
+                              >
+                                {metricCriteria[key] || 'How strongly this part of the swing supports a repeatable, balanced, and powerful move.'}
+                              </span>
+                            </button>
+                          </div>
+                          <span className="text-sm font-semibold text-gray-200">
+                            {Number(metric.score).toFixed(1)}/5.0
+                          </span>
+                        </div>
+                        <div className="mt-3 h-2 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-500">
+                          <div
+                            className="relative h-2"
+                            style={{ width: `${clampPercent(Number(metric.score))}%` }}
+                          >
+                            <span className="absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 translate-x-1/2 rounded-full bg-white shadow" />
+                          </div>
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-gray-400">{metric.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-gray-800 bg-gray-900 p-5 text-gray-300">
+                    Scorecard is still processing.
+                  </div>
+                )}
+
+                {details.retentionExpiresAt && (
+                  <p className="text-xs text-gray-500">
+                    You opted out of model-improvement retention. Stored trial content is scheduled for deletion after {formatDateTime(details.retentionExpiresAt)}.
+                  </p>
+                )}
+              </section>
+            </div>
+          )}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
