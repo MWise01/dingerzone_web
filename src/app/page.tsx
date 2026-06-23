@@ -137,31 +137,14 @@ export default function LandingPage() {
                   Try a Free Swing Upload
                 </Link>
                 <a
-                  href="#benefits-section"
+                  href="https://apple.co/3Js2maF"
                   className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-base font-bold text-blue-700 shadow-lg transition-colors hover:bg-gray-100"
                 >
-                  See How It Works
+                  Download Now
                 </a>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-gray-950 px-6 py-6 text-white">
-        <div className="container mx-auto flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Want to see your own swing?</h2>
-            <p className="mt-1 text-gray-300">
-              Upload one short clip and get a public trial result with video, computer vision, and AI feedback.
-            </p>
-          </div>
-          <Link
-            href="/try"
-            className="inline-flex items-center justify-center rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
-          >
-            Start Free Trial Upload
-          </Link>
         </div>
       </section>
 
