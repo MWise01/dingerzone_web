@@ -4,6 +4,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
 export default function LandingPage() {
@@ -128,8 +129,39 @@ export default function LandingPage() {
                 Don&apos;t whiff on hitting your potential<br /> 
                 Record, Get AI Tips, and Show Off to Coaches
               </p>
+              <div className="mt-8 flex flex-col items-end gap-3 sm:flex-row sm:justify-end">
+                <Link
+                  href="/try"
+                  className="inline-flex items-center justify-center rounded-md bg-orange-600 px-6 py-3 text-base font-bold text-white shadow-lg transition-colors hover:bg-orange-700"
+                >
+                  Try a Free Swing Upload
+                </Link>
+                <a
+                  href="#benefits-section"
+                  className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-base font-bold text-blue-700 shadow-lg transition-colors hover:bg-gray-100"
+                >
+                  See How It Works
+                </a>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-950 px-6 py-6 text-white">
+        <div className="container mx-auto flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Want to see your own swing?</h2>
+            <p className="mt-1 text-gray-300">
+              Upload one short clip and get a public trial result with video, computer vision, and AI feedback.
+            </p>
+          </div>
+          <Link
+            href="/try"
+            className="inline-flex items-center justify-center rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
+          >
+            Start Free Trial Upload
+          </Link>
         </div>
       </section>
 
