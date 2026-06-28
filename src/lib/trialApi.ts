@@ -47,6 +47,16 @@ export interface ScorecardMetric {
   description: string;
 }
 
+export interface LiveMetricSample {
+  t: number;
+  hipRotation?: number | null;
+  shoulderRotation?: number | null;
+  handSpeed?: number | null;
+  strideLengthPctHeight?: number | null;
+  centerOfMassShift?: number | null;
+  leadArmFlexion?: number | null;
+}
+
 export interface TrialVideoDetails {
   videoUrl: string;
   skeletonUrl: string | null;
@@ -57,6 +67,7 @@ export interface TrialVideoDetails {
   videoStatus: string | null;
   aiSummary: string | null;
   aiScorecard: Record<string, ScorecardMetric> | null;
+  liveMetrics?: LiveMetricSample[] | null;
   expirationTime: string;
   publicExpiresAt?: string;
   modelImprovementConsent?: boolean | null;

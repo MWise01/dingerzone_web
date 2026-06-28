@@ -4,8 +4,9 @@ import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  LiveMetricSample,
   ScorecardMetric,
   TrialVideoDetails,
   fetchTrialVideoDetails,
@@ -67,6 +68,172 @@ const getAverageScore = (scorecard: Record<string, ScorecardMetric> | null) => {
   return scores.reduce((sum, score) => sum + score, 0) / scores.length;
 };
 
+const liveMetricDefinitions = [
+  {
+    key: 'hipRotation',
+    label: 'Hip Rotation',
+    unit: 'deg',
+    description: 'Pelvis turn through load, launch, and contact.',
+  },
+  {
+    key: 'shoulderRotation',
+    label: 'Shoulder Rotation',
+    unit: 'deg',
+    description: 'Torso turn and separation as the swing unfolds.',
+  },
+  {
+    key: 'handSpeed',
+    label: 'Hand Speed',
+    unit: 'mph',
+    description: 'Estimated hand speed moving into the hitting zone.',
+  },
+  {
+    key: 'strideLengthPctHeight',
+    label: 'Stride Length',
+    unit: '% height',
+    description: 'Stride distance normalized to body scale.',
+  },
+  {
+    key: 'centerOfMassShift',
+    label: 'Center Mass Shift',
+    unit: 'in',
+    description: 'Horizontal body-center movement during weight transfer.',
+  },
+  {
+    key: 'leadArmFlexion',
+    label: 'Lead Arm Flexion',
+    unit: 'deg',
+    description: 'Lead elbow angle for connection and extension.',
+  },
+] as const;
+
+const findNearestMetricSample = (
+  samples: LiveMetricSample[] | null | undefined,
+  currentTime: number
+) => {
+  if (!samples?.length) return null;
+
+  return samples.reduce((nearest, sample) =>
+    Math.abs(sample.t - currentTime) < Math.abs(nearest.t - currentTime)
+      ? sample
+      : nearest
+  );
+};
+
+const formatLiveMetricValue = (
+  value: number | null | undefined,
+  unit: string
+) => {
+  if (!Number.isFinite(value)) return 'Pending';
+  const numericValue = Number(value);
+  const precision = unit === 'mph' || unit === 'in' ? 1 : 0;
+  return `${numericValue.toFixed(precision)} ${unit}`;
+};
+
+const LiveSwingMetrics = ({
+  sample,
+  currentTime,
+  duration,
+  hasSamples,
+}: {
+  sample: LiveMetricSample | null;
+  currentTime: number;
+  duration: number | null;
+  hasSamples: boolean;
+}) => {
+  const progress =
+    duration && duration > 0
+      ? Math.min(100, Math.max(0, (currentTime / duration) * 100))
+      : 0;
+
+  return (
+    <div className="mt-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold">Live Swing Metrics</h2>
+          <p className="mt-1 text-sm text-gray-400">
+            Synced to playback at a suggested 10 samples per second.
+          </p>
+        </div>
+        <span className="text-sm font-semibold text-orange-300">
+          {currentTime.toFixed(1)}s
+        </span>
+      </div>
+
+      <div className="mt-4 h-1.5 rounded-full bg-gray-800">
+        <div
+          className="h-1.5 rounded-full bg-blue-500 transition-[width]"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {liveMetricDefinitions.map((metric) => {
+          const value = sample?.[metric.key];
+          return (
+            <div key={metric.key} className="rounded-md border border-gray-800 bg-gray-950 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-white">{metric.label}</h3>
+                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                    {metric.description}
+                  </p>
+                </div>
+                <span className="shrink-0 text-sm font-bold text-blue-200">
+                  {hasSamples ? formatLiveMetricValue(value, metric.unit) : 'Pending'}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {!hasSamples && (
+        <p className="mt-3 text-xs leading-5 text-gray-500">
+          Time-synced metrics are not available for this swing yet. The page is ready to display them once the backend returns a compact metric series.
+        </p>
+      )}
+    </div>
+  );
+};
+
+const ShareSocialIcon = () => (
+  <svg
+    className="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <path d="M8.6 10.6l6.8-4.2" />
+    <path d="M8.6 13.4l6.8 4.2" />
+  </svg>
+);
+
+const RepeatOutlineIcon = () => (
+  <svg
+    className="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M17 2l4 4-4 4" />
+    <path d="M3 11V9a3 3 0 0 1 3-3h15" />
+    <path d="M7 22l-4-4 4-4" />
+    <path d="M21 13v2a3 3 0 0 1-3 3H3" />
+  </svg>
+);
+
 export default function TrialResultPage() {
   const params = useParams();
   const shareId = Array.isArray(params.shareId) ? params.shareId[0] : params.shareId;
@@ -76,6 +243,10 @@ export default function TrialResultPage() {
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'shared' | 'error'>('idle');
+  const [videoTime, setVideoTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if (!shareId) {
@@ -132,6 +303,36 @@ export default function TrialResultPage() {
   const activeVideoUrl = showSkeleton && details?.skeletonUrl ? details.skeletonUrl : details?.videoUrl;
   const activeVideoType = showSkeleton && details?.skeletonUrl ? 'video/mp4' : undefined;
   const summaryFeedback = details?.aiSummary ? cleanSummaryFeedback(details.aiSummary) : null;
+  const liveMetrics = details?.liveMetrics || null;
+  const activeMetricSample = findNearestMetricSample(liveMetrics, videoTime);
+  const hasLiveMetricSamples = Boolean(liveMetrics?.length);
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    setShareStatus('idle');
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'DingerZone Swing Analysis',
+          text: 'Check out this DingerZone swing analysis preview.',
+          url: shareUrl,
+        });
+        setShareStatus('shared');
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareUrl);
+      setShareStatus('copied');
+    } catch {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareStatus('copied');
+      } catch {
+        setShareStatus('error');
+      }
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-950 text-white">
@@ -151,12 +352,35 @@ export default function TrialResultPage() {
               </p>
             </div>
 
-            <Link
-              href="/try"
-              className="inline-flex items-center justify-center rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
-            >
-              Analyze Another Swing
-            </Link>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              {details && (
+                <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-400 bg-blue-600 px-6 py-3 font-bold text-white transition-colors hover:bg-blue-700"
+                  >
+                    <ShareSocialIcon />
+                    Share
+                  </button>
+                  {shareStatus !== 'idle' && (
+                    <p className="text-xs text-gray-300">
+                      {shareStatus === 'copied' && 'Link copied to clipboard.'}
+                      {shareStatus === 'shared' && 'Share sheet opened.'}
+                      {shareStatus === 'error' && 'Unable to copy link from this browser.'}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <Link
+                href="/try"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 font-bold text-white hover:bg-orange-700"
+              >
+                <RepeatOutlineIcon />
+                Analyze Another Swing
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -179,18 +403,16 @@ export default function TrialResultPage() {
             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
               <section>
                 <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h2 className="text-xl font-bold">
-                        {details.playerName || 'Public Trial Swing'}
-                      </h2>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="text-xl font-bold">DingerZone Slugger</h2>
                       <p className="text-sm text-gray-400">
                         Uploaded {formatDateTime(details.uploadDate) || 'recently'}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-300">Original</span>
+                    <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                      <span className="hidden text-sm text-gray-300 sm:inline">Original</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -209,7 +431,10 @@ export default function TrialResultPage() {
                           }`}
                         />
                       </button>
-                      <span className="text-sm text-gray-300">Computer Vision</span>
+                      <span className="hidden text-sm text-gray-300 sm:inline">Computer Vision</span>
+                      <span className="text-xs font-semibold text-gray-300 sm:hidden">
+                        {showSkeleton && hasSkeleton ? 'Computer Vision' : 'Original'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -217,12 +442,20 @@ export default function TrialResultPage() {
                 <div className="overflow-hidden rounded-lg bg-black">
                   {activeVideoUrl ? (
                     <video
+                      ref={videoRef}
                       key={activeVideoUrl}
                       controls
                       preload="metadata"
                       poster={details.thumbnailUrl || undefined}
                       playsInline
                       className="aspect-video w-full object-contain"
+                      onLoadedMetadata={(event) => {
+                        setVideoDuration(event.currentTarget.duration || null);
+                        setVideoTime(event.currentTarget.currentTime || 0);
+                      }}
+                      onTimeUpdate={(event) => {
+                        setVideoTime(event.currentTarget.currentTime || 0);
+                      }}
                       onError={(event) => {
                         const mediaError = event.currentTarget.error;
                         console.error('Video playback error', {
@@ -252,6 +485,13 @@ export default function TrialResultPage() {
                     <p>{videoError}</p>
                   </div>
                 )}
+
+                <LiveSwingMetrics
+                  sample={activeMetricSample}
+                  currentTime={videoTime}
+                  duration={videoDuration}
+                  hasSamples={hasLiveMetricSamples}
+                />
 
                 {!isProcessed && (
                   <div className="mt-4 rounded-lg border border-blue-800 bg-blue-950 p-4 text-blue-100">
