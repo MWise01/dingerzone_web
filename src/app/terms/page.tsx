@@ -35,7 +35,7 @@ export default function TermsOfService() {
           {/* Section 3: Subscriptions and Payments */}
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">3. Subscriptions and Payments</h2>
           <p className="text-lg text-gray-700 mb-6">
-            DingerZone offers a free tier and premium subscriptions (e.g., DINGERZONE Pro at $5.00/month with a 30-day free trial). Payments are processed via Stripe. By subscribing, you authorize recurring charges. You can manage or cancel subscriptions through the Stripe Billing Portal linked from the App. Refunds are not provided except as required by law. All fees are non-refundable after the trial period.
+            DingerZone offers a free tier and premium subscriptions (e.g., DINGERZONE Pro at $5.00/month with a 30-day free trial). Payments are processed via Apple&apos;s In-App-Payment IAP and Stripe. By subscribing, you authorize recurring charges. You can manage or cancel subscriptions through Apple&apos;s In-App-Payment IAP Subscriptions or using our Online Billing Portal hosted by Stripe, both platforms are linked from the App. Refunds are not provided except as required by law. All fees are non-refundable after the trial period.
           </p>
 
           {/* Section 4: Content Ownership and Usage */}
