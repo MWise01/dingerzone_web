@@ -15,6 +15,12 @@ import {
 const MAX_DURATION_SECONDS = 10;
 const FALLBACK_MAX_UPLOAD_BYTES = 75 * 1024 * 1024;
 
+const betaNotes = [
+  'AI feedback and swing metric calculations are in beta and may change as the model improves.',
+  'Use the scorecard as coaching context, not a definitive grade or medical/training diagnosis.',
+  'Short, side-view clips with the full hitter visible produce the most reliable analysis.',
+];
+
 const formatBytes = (bytes: number) => {
   const mb = bytes / (1024 * 1024);
   return `${mb.toFixed(mb >= 10 ? 0 : 1)} MB`;
@@ -148,15 +154,26 @@ export default function TrialUploadPage() {
         <section className="bg-gray-950 text-white">
           <div className="container mx-auto grid gap-8 px-6 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-14">
             <div>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-orange-300">
-                Free swing analysis preview
-              </p>
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gray-950">
+                  Beta
+                </span>
+                <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
+                  Free swing analysis preview
+                </p>
+              </div>
               <h1 className="mb-4 text-4xl font-bold leading-tight md:text-5xl">
                 Try DingerZone with one swing clip
               </h1>
               <p className="text-lg text-gray-200">
-                Upload a short baseball swing video and we will process it with the same AI feedback engine used in the app.
+                Upload a short baseball swing video and we will process it with our beta AI feedback engine and swing metric calculations.
               </p>
+              <div className="mt-5 rounded-lg border border-orange-400/40 bg-orange-500/10 p-4 text-sm leading-6 text-orange-50">
+                <p className="font-semibold text-orange-200">Beta analysis notice</p>
+                <p className="mt-1">
+                  This trial is built to help you explore feedback quickly while we continue tuning the computer vision, AI summary, and scorecard.
+                </p>
+              </div>
             </div>
 
             <form
@@ -236,11 +253,24 @@ export default function TrialUploadPage() {
           </div>
         </section>
 
+        <section className="container mx-auto px-6 pt-10">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-5 text-blue-950">
+            <h2 className="text-xl font-bold">What to expect from beta feedback</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {betaNotes.map((note) => (
+                <div key={note} className="rounded-md border border-blue-100 bg-white p-4 text-sm leading-6 text-gray-700">
+                  {note}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="container mx-auto grid gap-6 px-6 py-10 md:grid-cols-3">
           {[
             ['Upload', 'Choose a short swing clip from your phone or computer.'],
-            ['Process', 'DingerZone tracks the swing and generates computer vision output.'],
-            ['Review', 'See the original video, skeleton video, summary, and scorecard.'],
+            ['Process', 'DingerZone tracks the swing and generates beta computer vision output.'],
+            ['Review', 'See the original video, skeleton video, AI summary, and beta scorecard.'],
           ].map(([title, copy]) => (
             <div key={title} className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-2 text-xl font-bold text-gray-900">{title}</h2>

@@ -4,14 +4,21 @@ import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  LiveMetricSample,
   ScorecardMetric,
   TrialVideoDetails,
   fetchTrialVideoDetails,
 } from '../../../lib/trialApi';
 
 const POLL_INTERVAL_MS = 10000;
+
+const betaAnalysisNotes = [
+  'AI summaries and metric scores are beta outputs and may not capture every detail of the swing.',
+  'Use these scores as directional coaching context alongside your own review of the video.',
+  'Video angle, lighting, occlusion, and clip length can affect the computer vision and scorecard.',
+];
 
 const metricLabels: Record<string, string> = {
   handPath: 'Hand Path',
@@ -32,6 +39,45 @@ const metricCriteria: Record<string, string> = {
   followThrough: 'How the hitter finishes the swing with extension, balance, and a complete path through the hitting zone.',
   powerGeneration: 'How effectively the swing creates and transfers force from the ground through the body into the bat.',
 };
+
+const liveMetricDefinitions = [
+  {
+    key: 'hipRotation',
+    label: 'Hip Rotation',
+    unit: 'deg',
+    description: 'Pelvis turn through load, launch, and contact.',
+  },
+  {
+    key: 'shoulderRotation',
+    label: 'Shoulder Rotation',
+    unit: 'deg',
+    description: 'Torso turn and separation as the swing unfolds.',
+  },
+  {
+    key: 'handSpeed',
+    label: 'Hand Speed',
+    unit: 'mph',
+    description: 'Estimated hand speed moving into the hitting zone.',
+  },
+  {
+    key: 'strideLengthPctHeight',
+    label: 'Stride Length',
+    unit: '% height',
+    description: 'Stride distance normalized to body scale.',
+  },
+  {
+    key: 'centerOfMassShift',
+    label: 'Center Mass Shift',
+    unit: 'in',
+    description: 'Horizontal body-center movement during weight transfer.',
+  },
+  {
+    key: 'leadArmFlexion',
+    label: 'Lead Arm Flexion',
+    unit: 'deg',
+    description: 'Lead elbow angle for connection and extension.',
+  },
+] as const;
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return null;
@@ -67,6 +113,104 @@ const getAverageScore = (scorecard: Record<string, ScorecardMetric> | null) => {
   return scores.reduce((sum, score) => sum + score, 0) / scores.length;
 };
 
+const getTrialPlayerDisplayName = (playerName?: string | null) => {
+  const normalizedName = playerName?.trim();
+  if (!normalizedName || normalizedName.toLowerCase() === 'unknown player') {
+    return 'DingerZone Slugger';
+  }
+
+  return normalizedName;
+};
+
+const formatLiveMetricValue = (value: number | null | undefined, unit: string) => {
+  if (!Number.isFinite(value)) return 'Pending';
+  const precision = unit === 'mph' || unit === 'in' ? 1 : 0;
+  return `${Number(value).toFixed(precision)} ${unit}`;
+};
+
+function LiveSwingMetrics({
+  sample,
+  currentTime,
+  duration,
+  hasSamples,
+}: {
+  sample: LiveMetricSample | null;
+  currentTime: number;
+  duration: number | null;
+  hasSamples: boolean;
+}) {
+  const progress =
+    duration && duration > 0
+      ? Math.min(100, Math.max(0, (currentTime / duration) * 100))
+      : 0;
+
+  return (
+    <div className="mt-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold">Live Swing Metrics</h2>
+            <span className="rounded-full border border-orange-400/50 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+              Beta
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-gray-400">
+            Synced to playback at a suggested 10 samples per second.
+          </p>
+        </div>
+        <span className="text-sm font-semibold text-orange-300">
+          {currentTime.toFixed(1)}s
+        </span>
+      </div>
+
+      <div className="mt-4 h-1.5 rounded-full bg-gray-800">
+        <div
+          className="h-1.5 rounded-full bg-blue-500 transition-[width]"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {liveMetricDefinitions.map((metric) => (
+          <div key={metric.key} className="rounded-md border border-gray-800 bg-gray-950 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-bold text-white">{metric.label}</h3>
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  {metric.description}
+                </p>
+              </div>
+              <span className="shrink-0 text-sm font-bold text-blue-200">
+                {hasSamples ? formatLiveMetricValue(sample?.[metric.key], metric.unit) : 'Pending'}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {!hasSamples && (
+        <p className="mt-3 text-xs leading-5 text-gray-500">
+          Time-synced metrics are not available for this swing yet. The page is ready to display them once the backend returns a compact metric series.
+        </p>
+      )}
+    </div>
+  );
+}
+
+const getClosestLiveMetricSample = (
+  samples: LiveMetricSample[] | null | undefined,
+  currentTime: number
+) => {
+  if (!samples?.length) return null;
+
+  return samples.reduce((closest, sample) => {
+    if (!Number.isFinite(sample.t)) return closest;
+    return Math.abs(sample.t - currentTime) < Math.abs(closest.t - currentTime)
+      ? sample
+      : closest;
+  });
+};
+
 export default function TrialResultPage() {
   const params = useParams();
   const shareId = Array.isArray(params.shareId) ? params.shareId[0] : params.shareId;
@@ -76,6 +220,9 @@ export default function TrialResultPage() {
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     if (!shareId) {
@@ -132,6 +279,9 @@ export default function TrialResultPage() {
   const activeVideoUrl = showSkeleton && details?.skeletonUrl ? details.skeletonUrl : details?.videoUrl;
   const activeVideoType = showSkeleton && details?.skeletonUrl ? 'video/mp4' : undefined;
   const summaryFeedback = details?.aiSummary ? cleanSummaryFeedback(details.aiSummary) : null;
+  const liveMetrics = details?.liveMetrics || null;
+  const activeLiveMetricSample = getClosestLiveMetricSample(liveMetrics, videoCurrentTime);
+  const hasLiveMetricSamples = Boolean(liveMetrics?.length);
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-950 text-white">
@@ -140,9 +290,14 @@ export default function TrialResultPage() {
         <section className="border-b border-gray-800 bg-gray-900">
           <div className="container mx-auto flex flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
-                DingerZone trial result
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gray-950">
+                  Beta
+                </span>
+                <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
+                  DingerZone trial result
+                </p>
+              </div>
               <h1 className="mt-1 text-3xl font-bold">Swing Analysis</h1>
               <p className="mt-2 text-sm text-gray-300">
                 {details?.publicExpiresAt || details?.expirationTime
@@ -153,8 +308,23 @@ export default function TrialResultPage() {
 
             <Link
               href="/try"
-              className="inline-flex items-center justify-center rounded-md bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-700"
             >
+              <svg
+                aria-hidden="true"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M17 2l4 4-4 4" />
+                <path d="M3 11V9a3 3 0 0 1 3-3h15" />
+                <path d="M7 22l-4-4 4-4" />
+                <path d="M21 13v2a3 3 0 0 1-3 3H3" />
+              </svg>
               Analyze Another Swing
             </Link>
           </div>
@@ -178,11 +348,25 @@ export default function TrialResultPage() {
           {details && (
             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
               <section>
+                <div className="mb-4 rounded-lg border border-orange-400/40 bg-orange-500/10 p-4 text-sm leading-6 text-orange-50">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h2 className="font-bold text-orange-200">Beta analysis notice</h2>
+                      <p className="mt-1">
+                        DingerZone is still tuning this AI analysis and swing metric calculation system. Treat the feedback as helpful direction, not a final evaluation.
+                      </p>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-orange-300/50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-orange-200 sm:self-center">
+                      In development
+                    </span>
+                  </div>
+                </div>
+
                 <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <h2 className="text-xl font-bold">
-                        {details.playerName || 'Public Trial Swing'}
+                        {getTrialPlayerDisplayName(details.playerName)}
                       </h2>
                       <p className="text-sm text-gray-400">
                         Uploaded {formatDateTime(details.uploadDate) || 'recently'}
@@ -218,11 +402,19 @@ export default function TrialResultPage() {
                   {activeVideoUrl ? (
                     <video
                       key={activeVideoUrl}
+                      ref={videoRef}
                       controls
                       preload="metadata"
                       poster={details.thumbnailUrl || undefined}
                       playsInline
                       className="aspect-video w-full object-contain"
+                      onLoadedMetadata={(event) => {
+                        setVideoDuration(event.currentTarget.duration || null);
+                        setVideoCurrentTime(event.currentTarget.currentTime || 0);
+                      }}
+                      onTimeUpdate={(event) => {
+                        setVideoCurrentTime(event.currentTarget.currentTime || 0);
+                      }}
                       onError={(event) => {
                         const mediaError = event.currentTarget.error;
                         console.error('Video playback error', {
@@ -253,6 +445,13 @@ export default function TrialResultPage() {
                   </div>
                 )}
 
+                <LiveSwingMetrics
+                  sample={activeLiveMetricSample}
+                  currentTime={videoCurrentTime}
+                  duration={videoDuration}
+                  hasSamples={hasLiveMetricSamples}
+                />
+
                 {!isProcessed && (
                   <div className="mt-4 rounded-lg border border-blue-800 bg-blue-950 p-4 text-blue-100">
                     <h2 className="font-bold">Analysis in progress</h2>
@@ -265,9 +464,25 @@ export default function TrialResultPage() {
               </section>
 
               <section className="space-y-4">
+                <div className="rounded-lg border border-blue-800 bg-blue-950 p-5 text-blue-100">
+                  <h2 className="text-lg font-bold">How to read beta metrics</h2>
+                  <div className="mt-3 space-y-2">
+                    {betaAnalysisNotes.map((note) => (
+                      <p key={note} className="text-sm leading-6 text-blue-100">
+                        {note}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
                   <div className="flex items-center justify-between gap-4">
-                    <h2 className="text-xl font-bold">Overall</h2>
+                    <div>
+                      <h2 className="text-xl font-bold">Overall</h2>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+                        Beta score
+                      </p>
+                    </div>
                     <span className="text-lg font-bold text-orange-300">
                       {averageScore ? `${averageScore.toFixed(1)}/5.0` : 'Pending'}
                     </span>
@@ -286,7 +501,12 @@ export default function TrialResultPage() {
 
                 {summaryFeedback && (
                   <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                    <h2 className="text-xl font-bold">Summary Feedback</h2>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-xl font-bold">Summary Feedback</h2>
+                      <span className="rounded-full border border-orange-400/50 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+                        Beta AI
+                      </span>
+                    </div>
                     <p className="mt-3 whitespace-pre-line text-sm leading-6 text-gray-300">
                       {summaryFeedback}
                     </p>
@@ -300,6 +520,9 @@ export default function TrialResultPage() {
                         <div className="flex items-center justify-between gap-4">
                           <div className="relative flex items-center gap-2">
                             <h3 className="font-bold">{formatMetricLabel(key)}</h3>
+                            <span className="rounded-full border border-gray-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-300">
+                              Beta
+                            </span>
                             <button
                               type="button"
                               className="group flex h-5 w-5 items-center justify-center rounded-full border border-gray-500 text-xs font-bold text-gray-300 transition-colors hover:border-blue-300 hover:text-blue-200"
