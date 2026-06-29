@@ -14,6 +14,12 @@ import {
 
 const POLL_INTERVAL_MS = 10000;
 
+const betaAnalysisNotes = [
+  'AI summaries, live swing metrics, and scorecard values are beta outputs and may not capture every detail of the swing.',
+  'Use these results as directional coaching context alongside your own review of the video.',
+  'Video angle, lighting, occlusion, frame rate, and clip length can affect the computer vision output.',
+];
+
 const metricLabels: Record<string, string> = {
   handPath: 'Hand Path',
   stride: 'Stride',
@@ -150,7 +156,12 @@ const LiveSwingMetrics = ({
     <div className="mt-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold">Live Swing Metrics</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-bold">Live Swing Metrics</h2>
+            <span className="rounded-full border border-orange-400/50 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+              Beta
+            </span>
+          </div>
           <p className="mt-1 text-sm text-gray-400">
             Synced to playback at a suggested 10 samples per second.
           </p>
@@ -341,9 +352,14 @@ export default function TrialResultPage() {
         <section className="border-b border-gray-800 bg-gray-900">
           <div className="container mx-auto flex flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
-                DingerZone trial result
-              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gray-950">
+                  Beta
+                </span>
+                <p className="text-sm font-semibold uppercase tracking-wide text-orange-300">
+                  DingerZone trial result
+                </p>
+              </div>
               <h1 className="mt-1 text-3xl font-bold">Swing Analysis</h1>
               <p className="mt-2 text-sm text-gray-300">
                 {details?.publicExpiresAt || details?.expirationTime
@@ -402,6 +418,20 @@ export default function TrialResultPage() {
           {details && (
             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
               <section>
+                <div className="mb-4 rounded-lg border border-orange-400/40 bg-orange-500/10 p-4 text-sm leading-6 text-orange-50">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h2 className="font-bold text-orange-200">Beta analysis notice</h2>
+                      <p className="mt-1">
+                        DingerZone is still tuning this AI analysis and swing metric calculation system. Treat the feedback as helpful direction, not a final evaluation.
+                      </p>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-orange-300/50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-orange-200 sm:self-center">
+                      In development
+                    </span>
+                  </div>
+                </div>
+
                 <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -505,9 +535,25 @@ export default function TrialResultPage() {
               </section>
 
               <section className="space-y-4">
+                <div className="rounded-lg border border-blue-800 bg-blue-950 p-5 text-blue-100">
+                  <h2 className="text-lg font-bold">How to read beta analysis</h2>
+                  <div className="mt-3 space-y-2">
+                    {betaAnalysisNotes.map((note) => (
+                      <p key={note} className="text-sm leading-6 text-blue-100">
+                        {note}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
                   <div className="flex items-center justify-between gap-4">
-                    <h2 className="text-xl font-bold">Overall</h2>
+                    <div>
+                      <h2 className="text-xl font-bold">Overall</h2>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+                        Beta score
+                      </p>
+                    </div>
                     <span className="text-lg font-bold text-orange-300">
                       {averageScore ? `${averageScore.toFixed(1)}/5.0` : 'Pending'}
                     </span>
@@ -526,7 +572,12 @@ export default function TrialResultPage() {
 
                 {summaryFeedback && (
                   <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
-                    <h2 className="text-xl font-bold">Summary Feedback</h2>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-xl font-bold">Summary Feedback</h2>
+                      <span className="rounded-full border border-orange-400/50 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-orange-300">
+                        Beta AI
+                      </span>
+                    </div>
                     <p className="mt-3 whitespace-pre-line text-sm leading-6 text-gray-300">
                       {summaryFeedback}
                     </p>
@@ -540,6 +591,9 @@ export default function TrialResultPage() {
                         <div className="flex items-center justify-between gap-4">
                           <div className="relative flex items-center gap-2">
                             <h3 className="font-bold">{formatMetricLabel(key)}</h3>
+                            <span className="rounded-full border border-gray-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-300">
+                              Beta
+                            </span>
                             <button
                               type="button"
                               className="group flex h-5 w-5 items-center justify-center rounded-full border border-gray-500 text-xs font-bold text-gray-300 transition-colors hover:border-blue-300 hover:text-blue-200"

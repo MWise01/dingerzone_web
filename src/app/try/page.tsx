@@ -46,9 +46,15 @@ const filmingTips = [
 
 const processSteps = [
   ['1', 'Upload', 'Choose one short swing clip.'],
-  ['2', 'Analyze', 'AI maps movement and generates feedback.'],
-  ['3', 'Review', 'See the overlay, notes, and scorecard.'],
+  ['2', 'Analyze', 'Beta AI maps movement and generates feedback.'],
+  ['3', 'Review', 'See the overlay, notes, and beta scorecard.'],
   ['4', 'Share', 'Copy the 24-hour public link.'],
+];
+
+const betaNotes = [
+  'AI feedback and swing metric calculations are in beta and may change as the model improves.',
+  'Use the scorecard as coaching context, not a definitive grade or medical/training diagnosis.',
+  'Short, side-view clips with the full hitter visible produce the most reliable analysis.',
 ];
 
 const formatBytes = (bytes: number) => {
@@ -299,15 +305,26 @@ export default function TrialUploadPage() {
         <section className="bg-gray-950 text-white">
           <div className="container mx-auto grid gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.75fr)] lg:items-start lg:py-10 xl:gap-10">
             <div className="min-w-0 lg:col-start-1 lg:row-start-1">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-orange-300">
-                Free swing analysis preview
-              </p>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gray-950">
+                  Beta
+                </span>
+                <p className="text-xs font-semibold uppercase tracking-wide text-orange-300">
+                  Free swing analysis preview
+                </p>
+              </div>
               <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
                 Get AI feedback you can share.
               </h1>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-gray-200">
-                Try DingerZone with a short baseball swing clip. We process it into a computer-vision overlay, coaching-style feedback, and a scorecard-style breakdown.
+                Try DingerZone with a short baseball swing clip. We process it into a computer-vision overlay, coaching-style feedback, and a beta scorecard-style breakdown.
               </p>
+              <div className="mt-5 rounded-lg border border-orange-400/40 bg-orange-500/10 p-4 text-sm leading-6 text-orange-50">
+                <p className="font-semibold text-orange-200">Beta analysis notice</p>
+                <p className="mt-1">
+                  This preview is built to help you explore feedback quickly while we continue tuning the computer vision, AI summary, and swing metric calculations.
+                </p>
+              </div>
             </div>
 
             <form
@@ -458,6 +475,22 @@ export default function TrialUploadPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="container mx-auto px-6 pt-10">
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-5 text-blue-950">
+            <h2 className="text-xl font-bold">What to expect from beta feedback</h2>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {betaNotes.map((note) => (
+                <div
+                  key={note}
+                  className="rounded-md border border-blue-100 bg-white p-4 text-sm leading-6 text-gray-700"
+                >
+                  {note}
+                </div>
+              ))}
             </div>
           </div>
         </section>
