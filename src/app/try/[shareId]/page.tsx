@@ -4,7 +4,7 @@ import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   LiveMetricSample,
   ScorecardMetric,
@@ -13,6 +13,7 @@ import {
 } from '../../../lib/trialApi';
 
 const POLL_INTERVAL_MS = 10000;
+const FEEDBACK_EMAIL = 'feedback@dingerzone.ai';
 
 const betaAnalysisNotes = [
   'AI summaries, live swing metrics, and scorecard values are beta outputs and may not capture every detail of the swing.',
@@ -245,6 +246,23 @@ const RepeatOutlineIcon = () => (
   </svg>
 );
 
+const FeedbackIcon = () => (
+  <svg
+    className="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+    <path d="M8 9h8" />
+    <path d="M8 13h5" />
+  </svg>
+);
+
 export default function TrialResultPage() {
   const params = useParams();
   const shareId = Array.isArray(params.shareId) ? params.shareId[0] : params.shareId;
@@ -257,6 +275,18 @@ export default function TrialResultPage() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'shared' | 'error'>('idle');
   const [videoTime, setVideoTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState<number | null>(null);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSentiment, setFeedbackSentiment] = useState<
+    'helpful' | 'inaccurate' | 'confusing' | 'other'
+  >('inaccurate');
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [followUpConsent, setFollowUpConsent] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState<
+    'idle' | 'opened' | 'error'
+  >('idle');
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -317,6 +347,7 @@ export default function TrialResultPage() {
   const liveMetrics = details?.liveMetrics || null;
   const activeMetricSample = findNearestMetricSample(liveMetrics, videoTime);
   const hasLiveMetricSamples = Boolean(liveMetrics?.length);
+  const feedbackCanSubmit = feedbackText.trim().length >= 10;
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
@@ -345,6 +376,45 @@ export default function TrialResultPage() {
     }
   };
 
+  const handleFeedbackSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!shareId || !feedbackCanSubmit) return;
+
+    setFeedbackError(null);
+
+    try {
+      const playbackSeconds = Number.isFinite(videoTime) ? videoTime.toFixed(2) : 'Unknown';
+      const viewingMode = showSkeleton && hasSkeleton ? 'Computer Vision' : 'Original';
+      const subject = `[DZ-TRIAL-FEEDBACK] ${shareId}`;
+      const body = [
+        'DingerZone trial result feedback',
+        '',
+        `Share ID: ${shareId}`,
+        `Result URL: ${window.location.href}`,
+        `Feedback type: ${feedbackSentiment}`,
+        `Video status: ${details?.videoStatus || 'Unknown'}`,
+        `Viewing mode: ${viewingMode}`,
+        `Playback time: ${playbackSeconds}s`,
+        '',
+        'Feedback:',
+        feedbackText.trim(),
+        '',
+        'Contact:',
+        `Name: ${contactName.trim() || 'Not provided'}`,
+        `Email: ${contactEmail.trim() || 'Not provided'}`,
+        `Follow-up consent: ${followUpConsent ? 'Yes' : 'No'}`,
+      ].join('\n');
+
+      window.location.href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(
+        subject
+      )}&body=${encodeURIComponent(body)}`;
+      setFeedbackStatus('opened');
+    } catch {
+      setFeedbackStatus('error');
+      setFeedbackError(`Unable to open your email app. Please email ${FEEDBACK_EMAIL}.`);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-950 text-white">
       <Header />
@@ -368,13 +438,13 @@ export default function TrialResultPage() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center md:w-auto md:justify-end">
               {details && (
-                <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:items-end">
                   <button
                     type="button"
                     onClick={handleShare}
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-400 bg-blue-600 px-6 py-3 font-bold text-white transition-colors hover:bg-blue-700"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-blue-400 bg-blue-600 px-6 py-3 font-bold text-white transition-colors hover:bg-blue-700"
                   >
                     <ShareSocialIcon />
                     Share
@@ -391,7 +461,7 @@ export default function TrialResultPage() {
 
               <Link
                 href="/try"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 font-bold text-white hover:bg-orange-700"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 font-bold text-white hover:bg-orange-700"
               >
                 <RepeatOutlineIcon />
                 Analyze Another Swing
@@ -426,11 +496,150 @@ export default function TrialResultPage() {
                         DingerZone is still tuning this AI analysis and swing metric calculation system. Treat the feedback as helpful direction, not a final evaluation.
                       </p>
                     </div>
-                    <span className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-orange-300/50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-orange-200 sm:self-center">
-                      In development
-                    </span>
+                    <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                      <span className="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-orange-300/50 px-3 py-1 text-center text-xs font-semibold uppercase tracking-wide text-orange-200">
+                        In development
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowFeedbackForm((current) => !current);
+                          setFeedbackStatus((current) => (current === 'opened' ? 'idle' : current));
+                          setFeedbackError(null);
+                        }}
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-orange-300/60 px-4 py-2 text-sm font-bold text-orange-100 transition-colors hover:bg-orange-400/10"
+                        aria-expanded={showFeedbackForm}
+                      >
+                        <FeedbackIcon />
+                        {showFeedbackForm ? 'Hide Feedback' : 'Send Feedback'}
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {showFeedbackForm && (
+                  <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-5 text-gray-100">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h2 className="text-xl font-bold">Feedback for this result</h2>
+                        <p className="mt-1 text-sm leading-6 text-gray-300">
+                          Your note is attached to share ID {shareId} so we can review the exact clip, analysis state, and playback context.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowFeedbackForm(false)}
+                        className="self-start rounded-full border border-gray-600 px-3 py-1 text-sm font-semibold text-gray-200 hover:bg-gray-800"
+                      >
+                        Close
+                      </button>
+                    </div>
+
+                    {feedbackStatus === 'opened' ? (
+                      <div className="mt-4 rounded-md border border-green-500/40 bg-green-950 p-4 text-sm text-green-100">
+                        Your email app should be open with this result context included. Send that email to share the feedback.
+                      </div>
+                    ) : (
+                      <form onSubmit={handleFeedbackSubmit} className="mt-4 space-y-4">
+                        <div>
+                          <label htmlFor="feedbackSentiment" className="block text-sm font-bold">
+                            What should we look at?
+                          </label>
+                          <select
+                            id="feedbackSentiment"
+                            value={feedbackSentiment}
+                            onChange={(event) =>
+                              setFeedbackSentiment(event.target.value as typeof feedbackSentiment)
+                            }
+                            className="mt-2 w-full rounded-md border border-gray-700 bg-gray-950 px-3 py-3 text-white outline-none focus:border-orange-300"
+                          >
+                            <option value="inaccurate">Something seems inaccurate</option>
+                            <option value="confusing">The result is confusing</option>
+                            <option value="helpful">This was helpful</option>
+                            <option value="other">Other feedback</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label htmlFor="feedbackText" className="block text-sm font-bold">
+                            Feedback
+                          </label>
+                          <textarea
+                            id="feedbackText"
+                            value={feedbackText}
+                            onChange={(event) => setFeedbackText(event.target.value)}
+                            rows={5}
+                            maxLength={2000}
+                            placeholder="Tell us what looked right, wrong, unclear, or worth following up on."
+                            className="mt-2 w-full resize-y rounded-md border border-gray-700 bg-gray-950 px-3 py-3 text-white outline-none placeholder:text-gray-500 focus:border-orange-300"
+                            required
+                          />
+                          <p className="mt-1 text-xs text-gray-400">
+                            Minimum 10 characters. Do not include sensitive personal information.
+                          </p>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <label htmlFor="contactName" className="block text-sm font-bold">
+                              Name
+                            </label>
+                            <input
+                              id="contactName"
+                              type="text"
+                              value={contactName}
+                              onChange={(event) => setContactName(event.target.value)}
+                              placeholder="Optional"
+                              className="mt-2 w-full rounded-md border border-gray-700 bg-gray-950 px-3 py-3 text-white outline-none placeholder:text-gray-500 focus:border-orange-300"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="contactEmail" className="block text-sm font-bold">
+                              Email
+                            </label>
+                            <input
+                              id="contactEmail"
+                              type="email"
+                              value={contactEmail}
+                              onChange={(event) => setContactEmail(event.target.value)}
+                              placeholder="Optional"
+                              className="mt-2 w-full rounded-md border border-gray-700 bg-gray-950 px-3 py-3 text-white outline-none placeholder:text-gray-500 focus:border-orange-300"
+                            />
+                          </div>
+                        </div>
+
+                        <label className="flex items-start gap-3 text-sm leading-6 text-gray-300">
+                          <input
+                            type="checkbox"
+                            checked={followUpConsent}
+                            onChange={(event) => setFollowUpConsent(event.target.checked)}
+                            className="mt-1 h-4 w-4 rounded border-gray-700 bg-gray-950"
+                          />
+                          You may contact me for follow-up or clarification about this feedback.
+                        </label>
+
+                        {feedbackError && (
+                          <div className="rounded-md border border-red-500/50 bg-red-950 p-3 text-sm text-red-100">
+                            {feedbackError}
+                          </div>
+                        )}
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                          <button
+                            type="submit"
+                            disabled={!feedbackCanSubmit}
+                            className="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-600 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Email Feedback
+                          </button>
+                          <p className="text-xs leading-5 text-gray-400">
+                            Captures current view: {showSkeleton && hasSkeleton ? 'computer vision' : 'original'} at {videoTime.toFixed(1)}s.
+                          </p>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
 
                 <div className="mb-4 rounded-lg border border-gray-800 bg-gray-900 p-4">
                   <div className="flex items-start justify-between gap-3">
