@@ -131,6 +131,12 @@ export default function LandingPage() {
               </p>
               <div className="mt-8 flex flex-col items-end gap-3 sm:flex-row sm:justify-end">
                 <Link
+                  href="/examples"
+                  className="inline-flex items-center justify-center rounded-md border border-white bg-white/10 px-6 py-3 text-base font-bold text-white shadow-lg transition-colors hover:bg-white/20"
+                >
+                  See Example Analysis
+                </Link>
+                <Link
                   href="/try"
                   className="inline-flex items-center justify-center rounded-md bg-orange-600 px-6 py-3 text-base font-bold text-white shadow-lg transition-colors hover:bg-orange-700"
                 >
