@@ -1,4 +1,9 @@
 import type { ScorecardMetric, TrialVideoDetails } from '../lib/trialApi';
+import {
+  youthFluidRhythmLiveMetrics,
+  youthPowerSyncLiveMetrics,
+  youthSmoothTimingLiveMetrics,
+} from './exampleLiveMetrics';
 
 export type ExampleAnalysis = TrialVideoDetails & {
   slug: string;
@@ -8,10 +13,12 @@ export type ExampleAnalysis = TrialVideoDetails & {
   highlight: string;
   outcome: string;
   assetsPending?: boolean;
-  sourceShareId?: string;
-  sourceRecord?: {
-    userKey: string;
+  analysisRun?: {
     videoRecordId: string;
+    executionName: string;
+    finishedAt: string;
+    keypointRecordCount: number;
+    skeletonObjectName: string;
   };
 };
 
@@ -31,33 +38,35 @@ export const exampleAnalyses: ExampleAnalysis[] = [
     title: 'Youth Fluid Rhythm',
     eyebrow: 'Real record test',
     audience: 'Players and parents',
-    highlight: 'Uses an existing shared video record to test the persistent examples flow with real analysis output.',
-    outcome: 'Shows rhythm, lower-body timing, torso coordination, live metrics, original video, and computer-vision playback from an existing record.',
-    sourceShareId: '2638a3af-a9bd-4473-8c95-36b52228c9bc',
-    sourceRecord: {
-      userKey: '74c824d8-40f1-70fd-e7b4-33c5bdc19463',
+    highlight: 'Uses a curated example clip with real analysis output from the July 2026 rerun.',
+    outcome: 'Shows rhythm, lower-body timing, torso coordination, original video, and computer-vision playback from example-specific assets.',
+    analysisRun: {
       videoRecordId: '4d709676-430c-4987-b38d-496ef6a5c10a',
+      executionName: 'rerun-4d709676-20260708',
+      finishedAt: '2026-07-08T14:42:19Z',
+      keypointRecordCount: 202,
+      skeletonObjectName: '4d709676-430c-4987-b38d-496ef6a5c10a_skeleton.mp4',
     },
     videoUrl: '',
     originalVideoUrl: '/assets/examples/videos/youth-fluid-rhythm-original.mp4',
-    skeletonUrl: null,
+    skeletonUrl: '/assets/examples/videos/youth-fluid-rhythm-skeleton.mp4',
     thumbnailUrl: '/assets/examples/youth-fluid-rhythm.jpg',
     playerName: 'Youth Slugger',
     uploadDate: '2026-02-16T17:00:42Z',
-    description: 'Example analysis loaded from an existing DingerZone swing record.',
+    description: 'Curated example analysis generated from the July 2026 rerun.',
     videoStatus: 'Processed',
     aiSummary:
-      'Your swing rhythm has become more fluid over time, building better timing.\nLower body initiation could start a touch earlier for more power.\nTorso twist coordination is sometimes off, affecting overall balance.\n\nRecommended drills:\nTee work with pause to refine torso rotation sync.\nSoft toss with emphasis on earlier pelvis drive for added pop.\nBalance drills to improve overall stability and timing.',
+      'Your load phase is getting smoother, building better rhythm.\nLower body initiation could start a touch earlier for more pop.\nTorso twist coordination is getting more efficient.\n\nRecommended drills:\nTee work with pause to refine torso rotation sync.\nFence drills to keep the front shoulder closed longer.\nSoft toss with an emphasis on hip firing sequence.',
     aiScorecard: scorecard({
-      handPath: [3.4, 'Moderate efficiency with slight loop or drop.'],
-      stride: [3.1, 'Adequate but slightly long or short.'],
-      headPosition: [3.9, 'Minimal movement with good tracking.'],
-      hipRotation: [3.6, 'Partial rotation with decent power.'],
-      shoulderHipHandTiming: [3.5, 'Slight disconnect in timing.'],
-      followThrough: [3.8, 'Good extension with a controlled finish.'],
-      powerGeneration: [3.7, 'Moderate power that relies on the arms.'],
+      handPath: [4.2, 'Efficient path with minimal deviations.'],
+      stride: [3.9, 'Good length and direction, minor balance issues.'],
+      headPosition: [4.7, 'Stable, eyes locked on pitch.'],
+      hipRotation: [3.5, 'Partial rotation, decent power.'],
+      shoulderHipHandTiming: [4.1, 'Good sequence, minor timing issues.'],
+      followThrough: [4.6, 'Good extension, controlled finish.'],
+      powerGeneration: [3.9, 'Good power, some lower body.'],
     }),
-    liveMetrics: null,
+    liveMetrics: youthFluidRhythmLiveMetrics,
     expirationTime: '',
     publicExpiresAt: undefined,
     retentionExpiresAt: null,
@@ -67,33 +76,35 @@ export const exampleAnalyses: ExampleAnalysis[] = [
     title: 'Youth Smooth Timing',
     eyebrow: 'Timing and balance',
     audience: 'Players and parents',
-    highlight: 'Uses a real shared record to show smoother rhythm, strong posture, and lower-body timing cues.',
-    outcome: 'Shows smoother rhythm, strong torso balance, lower-body sync, original video, computer-vision playback, scorecard, and live metrics.',
-    sourceShareId: 'c6f53bf1-95ca-4820-aaf7-26160d06c019',
-    sourceRecord: {
-      userKey: '74c824d8-40f1-70fd-e7b4-33c5bdc19463',
+    highlight: 'Uses a curated example clip to show smoother rhythm, strong posture, and lower-body timing cues.',
+    outcome: 'Shows smoother rhythm, strong torso balance, lower-body sync, original video, computer-vision playback, and scorecard.',
+    analysisRun: {
       videoRecordId: 'db494a19-ae61-402b-8077-5573af79896d',
+      executionName: 'rerun-db494a19-20260708',
+      finishedAt: '2026-07-08T14:42:09Z',
+      keypointRecordCount: 101,
+      skeletonObjectName: 'db494a19-ae61-402b-8077-5573af79896d_skeleton.mp4',
     },
     videoUrl: '',
     originalVideoUrl: '/assets/examples/videos/youth-smooth-timing-original.mp4',
-    skeletonUrl: null,
+    skeletonUrl: '/assets/examples/videos/youth-smooth-timing-skeleton.mp4',
     thumbnailUrl: '/assets/examples/youth-smooth-timing.jpg',
     playerName: 'Youth Slugger',
     uploadDate: '2026-02-11T01:11:49.249Z',
-    description: 'Example analysis loaded from an existing DingerZone swing record.',
+    description: 'Curated example analysis generated from the July 2026 rerun.',
     videoStatus: 'Processed',
     aiSummary:
-      'Your swing rhythm is getting smoother, building better timing.\nLower body initiation could start a touch earlier for more power.\nTorso lean and balance have stayed consistently strong.\n\nRecommended drills:\nTee work with pause to refine lower body sync.\nFence drills to keep the front shoulder closed longer.\nSoft toss with an inside pitch focus to enhance torso rotation.',
+      'Torso rotation has become more efficient, generating better power.\nLower body initiation could start a touch earlier for more explosiveness.\nLoad phase is getting smoother, building better rhythm.\n\nRecommended drills:\nTee work with pause to refine torso rotation sync.\nPelvic tilt exercises to enhance lower body timing and coordination.',
     aiScorecard: scorecard({
-      handPath: [4.2, 'Efficient path with minimal deviations.'],
-      stride: [3.9, 'Good length and direction with minor balance issues.'],
-      headPosition: [4.6, 'Minimal movement with good tracking.'],
-      hipRotation: [3.4, 'Partial rotation with decent power.'],
-      shoulderHipHandTiming: [4.4, 'Good sequence with minor timing issues.'],
-      followThrough: [4.8, 'Full extension with a natural finish.'],
-      powerGeneration: [4.0, 'Good power with some lower body contribution.'],
+      handPath: [2.9, 'Significant loop or drop in path.'],
+      stride: [3.4, 'Adequate but slightly long/short.'],
+      headPosition: [3.1, 'Minor movement but maintains focus.'],
+      hipRotation: [3.8, 'Partial rotation, decent power.'],
+      shoulderHipHandTiming: [4.5, 'Good sequence, minor timing issues.'],
+      followThrough: [4.2, 'Good extension, controlled finish.'],
+      powerGeneration: [3.6, 'Moderate power, relies on arms.'],
     }),
-    liveMetrics: null,
+    liveMetrics: youthSmoothTimingLiveMetrics,
     expirationTime: '',
     publicExpiresAt: undefined,
     retentionExpiresAt: null,
@@ -103,33 +114,35 @@ export const exampleAnalyses: ExampleAnalysis[] = [
     title: 'Youth Power Sync',
     eyebrow: 'Power sequence',
     audience: 'Players and coaches',
-    highlight: 'Uses a real shared record to show torso posture, lower-body initiation, and improved swing efficiency.',
-    outcome: 'Shows improved posture, hand speed, lower-body timing, original video, computer-vision playback, scorecard, and live metrics.',
-    sourceShareId: 'c7a52125-668c-4c2b-a98e-f54ce6afaf13',
-    sourceRecord: {
-      userKey: '74c824d8-40f1-70fd-e7b4-33c5bdc19463',
+    highlight: 'Uses a curated example clip to show torso posture, lower-body initiation, and improved swing efficiency.',
+    outcome: 'Shows improved posture, hand speed, lower-body timing, original video, computer-vision playback, and scorecard.',
+    analysisRun: {
       videoRecordId: '651003e5-800f-4c53-95ef-4753978e548b',
+      executionName: 'rerun-651003e5-20260708',
+      finishedAt: '2026-07-08T14:42:28Z',
+      keypointRecordCount: 170,
+      skeletonObjectName: '651003e5-800f-4c53-95ef-4753978e548b_skeleton.mp4',
     },
     videoUrl: '',
     originalVideoUrl: '/assets/examples/videos/youth-power-sync-original.mp4',
-    skeletonUrl: null,
+    skeletonUrl: '/assets/examples/videos/youth-power-sync-skeleton.mp4',
     thumbnailUrl: '/assets/examples/youth-power-sync.jpg',
     playerName: 'Youth Slugger',
     uploadDate: '2026-02-11T15:59:00.158Z',
-    description: 'Example analysis loaded from an existing DingerZone swing record.',
+    description: 'Curated example analysis generated from the July 2026 rerun.',
     videoStatus: 'Processed',
     aiSummary:
-      'Torso lean and posture have become more consistent and powerful.\nLower body initiation could start a touch earlier for more pop.\nHand speed and overall swing efficiency have improved significantly.\n\nRecommended drills:\nTee work with pause to refine torso rotation sync.\nFence drills to keep the front shoulder closed longer.\nWall ball drills to enhance hip and pelvis drive timing.',
+      'Lower body initiation has improved significantly, generating more power.\nTorso twist coordination is getting smoother, enhancing overall swing efficiency.\nFront shoulder closure could be maintained slightly longer for better extension.\n\nRecommended drills:\nTee work with pause to refine torso rotation sync.\nFence drills to keep the front shoulder closed longer.\nSoft toss with emphasis on pelvis drive for added lower body explosiveness.',
     aiScorecard: scorecard({
       handPath: [4.2, 'Efficient path with minimal deviations.'],
-      stride: [3.9, 'Good length and direction with minor balance issues.'],
-      headPosition: [4.6, 'Minimal movement with good tracking.'],
-      hipRotation: [3.4, 'Partial rotation with decent power.'],
-      shoulderHipHandTiming: [4.3, 'Good sequence with minor timing issues.'],
-      followThrough: [4.5, 'Good extension with a controlled finish.'],
-      powerGeneration: [3.8, 'Good power with some lower body contribution.'],
+      stride: [3.8, 'Adequate but slightly long/short.'],
+      headPosition: [4.7, 'Stable, eyes locked on pitch.'],
+      hipRotation: [3.5, 'Partial rotation, decent power.'],
+      shoulderHipHandTiming: [4.1, 'Good sequence, minor timing issues.'],
+      followThrough: [4.6, 'Good extension, controlled finish.'],
+      powerGeneration: [3.9, 'Good power, some lower body.'],
     }),
-    liveMetrics: null,
+    liveMetrics: youthPowerSyncLiveMetrics,
     expirationTime: '',
     publicExpiresAt: undefined,
     retentionExpiresAt: null,

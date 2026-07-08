@@ -1,13 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ExampleAnalysis } from '../data/exampleAnalyses';
 import {
-  fetchTrialVideoDetails,
   LiveMetricSample,
   ScorecardMetric,
-  TrialVideoDetails,
 } from '../lib/trialApi';
 
 const metricLabels: Record<string, string> = {
@@ -79,46 +77,12 @@ const formatLiveMetricValue = (
 };
 
 export default function ExampleResultView({ example }: { example: ExampleAnalysis }) {
-  const [resolvedDetails, setResolvedDetails] = useState<TrialVideoDetails | null>(null);
-  const [detailsError, setDetailsError] = useState<string | null>(null);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [activeInfoKey, setActiveInfoKey] = useState<string | null>(null);
   const [videoTime, setVideoTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState<number | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
-  const details = resolvedDetails || example;
-
-  useEffect(() => {
-    if (!example.sourceShareId) {
-      setResolvedDetails(null);
-      setDetailsError(null);
-      return;
-    }
-
-    let isMounted = true;
-    setResolvedDetails(null);
-    setDetailsError(null);
-    setVideoError(null);
-    setShowSkeleton(false);
-
-    fetchTrialVideoDetails(example.sourceShareId)
-      .then((nextDetails) => {
-        if (!isMounted) return;
-        setResolvedDetails(nextDetails);
-      })
-      .catch((error) => {
-        if (!isMounted) return;
-        setDetailsError(
-          error instanceof Error
-            ? error.message
-            : 'Unable to load this example video.'
-        );
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [example.sourceShareId]);
+  const details = example;
 
   const scoreEntries = useMemo(
     () => Object.entries(details.aiScorecard || {}),
@@ -129,7 +93,6 @@ export default function ExampleResultView({ example }: { example: ExampleAnalysi
   const originalVideoUrl = example.originalVideoUrl || details.originalVideoUrl || details.videoUrl;
   const activeVideoUrl = showSkeleton && details.skeletonUrl ? details.skeletonUrl : originalVideoUrl;
   const activeVideoType = activeVideoUrl ? 'video/mp4' : undefined;
-  const isLoadingSource = Boolean(example.sourceShareId && !resolvedDetails && !detailsError);
   const shouldRenderVideo = Boolean(activeVideoUrl) && !example.assetsPending;
   const activeMetricSample = findNearestMetricSample(details.liveMetrics, videoTime);
   const hasLiveMetricSamples = Boolean(details.liveMetrics?.length);
@@ -214,23 +177,15 @@ export default function ExampleResultView({ example }: { example: ExampleAnalysi
               )}
               <div className="relative z-10 max-w-md px-6 text-center">
                 <p className="text-lg font-bold">
-                  {isLoadingSource ? 'Loading sample video...' : 'Marketing clip asset pending'}
+                  Marketing clip asset pending
                 </p>
                 <p className="mt-2 text-sm leading-6 text-gray-300">
-                  {isLoadingSource
-                    ? 'Fetching fresh playback URLs for this approved example.'
-                    : 'Playback will be enabled once the approved original and computer-vision clips are attached.'}
+                  Playback will be enabled once the approved original and computer-vision clips are attached.
                 </p>
               </div>
             </div>
           )}
         </div>
-
-        {detailsError && (
-          <div className="mt-4 rounded-lg border border-red-800 bg-red-950 p-4 text-sm text-red-100">
-            <p>{detailsError}</p>
-          </div>
-        )}
 
         {videoError && (
           <div className="mt-4 rounded-lg border border-yellow-700 bg-yellow-950 p-4 text-sm text-yellow-100">
