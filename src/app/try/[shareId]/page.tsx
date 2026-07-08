@@ -341,8 +341,9 @@ export default function TrialResultPage() {
   const averageScore = getAverageScore(details?.aiScorecard || null);
   const isProcessed = details?.videoStatus === 'Processed';
   const hasSkeleton = Boolean(details?.skeletonUrl);
-  const activeVideoUrl = showSkeleton && details?.skeletonUrl ? details.skeletonUrl : details?.videoUrl;
-  const activeVideoType = showSkeleton && details?.skeletonUrl ? 'video/mp4' : undefined;
+  const originalVideoUrl = details?.originalVideoUrl || details?.videoUrl;
+  const activeVideoUrl = showSkeleton && details?.skeletonUrl ? details.skeletonUrl : originalVideoUrl;
+  const activeVideoType = activeVideoUrl ? 'video/mp4' : undefined;
   const summaryFeedback = details?.aiSummary ? cleanSummaryFeedback(details.aiSummary) : null;
   const liveMetrics = details?.liveMetrics || null;
   const activeMetricSample = findNearestMetricSample(liveMetrics, videoTime);

@@ -319,6 +319,14 @@ export default function TrialUploadPage() {
               <p className="mt-4 max-w-2xl text-lg leading-8 text-gray-200">
                 Try DingerZone with a short baseball swing clip. We process it into a computer-vision overlay, coaching-style feedback, and a beta scorecard-style breakdown.
               </p>
+              <div className="mt-5">
+                <Link
+                  href="/examples"
+                  className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-300 px-5 py-3 text-sm font-bold text-blue-100 transition-colors hover:bg-blue-500/10"
+                >
+                  See sample results first
+                </Link>
+              </div>
               <div className="mt-5 rounded-lg border border-orange-400/40 bg-orange-500/10 p-4 text-sm leading-6 text-orange-50">
                 <p className="font-semibold text-orange-200">Beta analysis notice</p>
                 <p className="mt-1">

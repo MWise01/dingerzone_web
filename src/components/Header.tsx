@@ -9,6 +9,7 @@ import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
 const navItems = [
   { name: "Home", href: "/#home-section" },
   { name: "Try It", href: "/try" },
+  { name: "Examples", href: "/examples" },
   { name: "About", href: "/#about-section" },
   { name: "FAQ", href: "/#faq-section" },
   { name: "Getting Started", href: "/getting-started" }, // separate page
