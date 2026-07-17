@@ -12,6 +12,7 @@ import {
   completeTrialUpload,
   isVideoFile,
 } from '../../lib/trialApi';
+import { trackAnalyticsEvent } from '../../lib/analytics';
 
 const MAX_DURATION_SECONDS = 10;
 const FALLBACK_MAX_UPLOAD_BYTES = 75 * 1024 * 1024;
@@ -198,12 +199,19 @@ export default function TrialUploadPage() {
 
     if (!selectedFile) return;
 
+    trackAnalyticsEvent('trial_file_selected', {
+      sizeMb: Number((selectedFile.size / (1024 * 1024)).toFixed(1)),
+      type: selectedFile.type || 'unknown',
+    });
+
     if (!isVideoFile(selectedFile)) {
+      trackAnalyticsEvent('trial_file_rejected', { reason: 'invalid_type' });
       setError('Please choose a video file.');
       return;
     }
 
     if (selectedFile.size > maxUploadBytes) {
+      trackAnalyticsEvent('trial_file_rejected', { reason: 'too_large' });
       setError(`Please choose a video under ${formatBytes(maxUploadBytes)}.`);
       return;
     }
@@ -211,12 +219,16 @@ export default function TrialUploadPage() {
     try {
       const videoDuration = await getVideoDuration(selectedFile);
       setDuration(videoDuration);
+      trackAnalyticsEvent('trial_file_duration_loaded', {
+        durationSeconds: Number(videoDuration.toFixed(1)),
+      });
       if (videoDuration > MAX_DURATION_SECONDS) {
         setDurationWarning(
           `This clip is ${videoDuration.toFixed(1)} seconds. Short clips under ${MAX_DURATION_SECONDS} seconds process best.`
         );
       }
     } catch {
+      trackAnalyticsEvent('trial_file_duration_error');
       setDurationWarning('We could not verify the clip length, but you can still try the upload.');
     }
   };
@@ -237,6 +249,11 @@ export default function TrialUploadPage() {
 
     setIsUploading(true);
     setError(null);
+    trackAnalyticsEvent('trial_upload_started', {
+      consent,
+      sizeMb: Number((file.size / (1024 * 1024)).toFixed(1)),
+      durationSeconds: duration ? Number(duration.toFixed(1)) : 0,
+    });
 
     try {
       setStep('starting');
@@ -252,8 +269,13 @@ export default function TrialUploadPage() {
       setStep('completing');
       const completeResponse = await completeTrialUpload(startResponse.trialId);
 
+      trackAnalyticsEvent('trial_upload_completed', {
+        consent,
+        durationSeconds: duration ? Number(duration.toFixed(1)) : 0,
+      });
       router.push(`/try/${completeResponse.shareId}`);
     } catch (uploadError) {
+      trackAnalyticsEvent('trial_upload_failed');
       setError(
         uploadError instanceof Error
           ? uploadError.message
@@ -267,6 +289,7 @@ export default function TrialUploadPage() {
   const handleShareTryPage = async () => {
     const shareUrl = `${window.location.origin}/try`;
     setTryPageShareStatus('idle');
+    trackAnalyticsEvent('share_click', { location: 'try_page' });
 
     try {
       if (navigator.share) {
@@ -276,17 +299,30 @@ export default function TrialUploadPage() {
           url: shareUrl,
         });
         setTryPageShareStatus('shared');
+        trackAnalyticsEvent('share_success', {
+          location: 'try_page',
+          method: 'native',
+        });
         return;
       }
 
       await navigator.clipboard.writeText(shareUrl);
       setTryPageShareStatus('copied');
+      trackAnalyticsEvent('share_success', {
+        location: 'try_page',
+        method: 'clipboard',
+      });
     } catch {
       try {
         await navigator.clipboard.writeText(shareUrl);
         setTryPageShareStatus('copied');
+        trackAnalyticsEvent('share_success', {
+          location: 'try_page',
+          method: 'clipboard_fallback',
+        });
       } catch {
         setTryPageShareStatus('error');
+        trackAnalyticsEvent('share_error', { location: 'try_page' });
       }
     }
   };
@@ -323,6 +359,12 @@ export default function TrialUploadPage() {
                 <Link
                   href="/examples"
                   className="inline-flex min-h-11 items-center justify-center rounded-md border border-blue-300 px-5 py-3 text-sm font-bold text-blue-100 transition-colors hover:bg-blue-500/10"
+                  onClick={() =>
+                    trackAnalyticsEvent('cta_click', {
+                      location: 'try_page',
+                      label: 'examples',
+                    })
+                  }
                 >
                   See sample results first
                 </Link>
@@ -400,6 +442,11 @@ export default function TrialUploadPage() {
                     muted
                     playsInline
                     className="aspect-video w-full object-contain"
+                    onPlay={() =>
+                      trackAnalyticsEvent('video_play', {
+                        location: 'try_upload_preview',
+                      })
+                    }
                   />
                 </div>
               )}

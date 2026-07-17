@@ -7,6 +7,7 @@ import {
   LiveMetricSample,
   ScorecardMetric,
 } from '../lib/trialApi';
+import { trackAnalyticsEvent } from '../lib/analytics';
 
 const metricLabels: Record<string, string> = {
   handPath: 'Hand Path',
@@ -116,6 +117,11 @@ export default function ExampleResultView({ example }: { example: ExampleAnalysi
                 type="button"
                 onClick={() => {
                   setVideoError(null);
+                  trackAnalyticsEvent('video_mode_toggle', {
+                    location: 'example_result',
+                    example: example.slug,
+                    mode: showSkeleton ? 'original' : 'computer_vision',
+                  });
                   setShowSkeleton((current) => !current);
                 }}
                 disabled={!hasSkeleton}
@@ -151,10 +157,22 @@ export default function ExampleResultView({ example }: { example: ExampleAnalysi
                 setVideoDuration(event.currentTarget.duration || null);
                 setVideoTime(event.currentTarget.currentTime || 0);
               }}
+              onPlay={() => {
+                trackAnalyticsEvent('video_play', {
+                  location: 'example_result',
+                  example: example.slug,
+                  mode: showSkeleton && hasSkeleton ? 'computer_vision' : 'original',
+                });
+              }}
               onTimeUpdate={(event) => {
                 setVideoTime(event.currentTarget.currentTime || 0);
               }}
               onError={() => {
+                trackAnalyticsEvent('video_error', {
+                  location: 'example_result',
+                  example: example.slug,
+                  mode: showSkeleton && hasSkeleton ? 'computer_vision' : 'original',
+                });
                 setVideoError(
                   showSkeleton
                     ? 'Computer vision video is not playable yet. Try switching back to Original, then retry in a moment.'
