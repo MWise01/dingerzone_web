@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
+import { trackAnalyticsEvent } from '../lib/analytics';
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'Player' | 'Parent' | 'Coach'>('Player');
@@ -87,6 +88,10 @@ export default function LandingPage() {
   ];
 
   const toggleFaq = (index: number) => {
+    trackAnalyticsEvent('faq_toggle', {
+      question: faqs[index]?.question || `faq_${index}`,
+      expanded: openFaq !== index,
+    });
     setOpenFaq(openFaq === index ? null : index);
   };
 
@@ -133,18 +138,33 @@ export default function LandingPage() {
                 <Link
                   href="/examples"
                   className="inline-flex items-center justify-center rounded-md border border-white bg-white/10 px-6 py-3 text-base font-bold text-white shadow-lg transition-colors hover:bg-white/20"
+                  onClick={() =>
+                    trackAnalyticsEvent('cta_click', {
+                      location: 'hero',
+                      label: 'examples',
+                    })
+                  }
                 >
                   See Example Analysis
                 </Link>
                 <Link
                   href="/try"
                   className="inline-flex items-center justify-center rounded-md bg-orange-600 px-6 py-3 text-base font-bold text-white shadow-lg transition-colors hover:bg-orange-700"
+                  onClick={() =>
+                    trackAnalyticsEvent('cta_click', {
+                      location: 'hero',
+                      label: 'try_upload',
+                    })
+                  }
                 >
                   Try a Free Swing Upload
                 </Link>
                 <a
                   href="https://apple.co/3Js2maF"
                   className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-base font-bold text-blue-700 shadow-lg transition-colors hover:bg-gray-100"
+                  onClick={() =>
+                    trackAnalyticsEvent('app_store_click', { location: 'hero' })
+                  }
                 >
                   Download Now
                 </a>
@@ -200,7 +220,10 @@ export default function LandingPage() {
             {tabs.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  trackAnalyticsEvent('audience_tab_click', { tab });
+                  setActiveTab(tab);
+                }}
                 className={`flex items-center px-4 py-2 rounded-full font-semibold text-sm transition-colors ${
                   activeTab === tab
                     ? 'bg-blue-600 text-white'
@@ -255,6 +278,9 @@ export default function LandingPage() {
               <a
                 href="https://apple.co/3Js2maF"
                 className="inline-block"
+                onClick={() =>
+                  trackAnalyticsEvent('app_store_click', { location: 'benefits' })
+                }
               >
                 <Image
                   src="/assets/images/appstore_black.svg"
@@ -337,6 +363,9 @@ export default function LandingPage() {
             <a
               href="mailto:feedback@dingerzone.ai"
               className="text-blue-600 hover:underline"
+              onClick={() =>
+                trackAnalyticsEvent('contact_click', { location: 'contact_section' })
+              }
             >
               feedback@dingerzone.ai
             </a>

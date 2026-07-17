@@ -11,6 +11,7 @@ import {
   TrialVideoDetails,
   fetchTrialVideoDetails,
 } from '../../../lib/trialApi';
+import { trackAnalyticsEvent } from '../../../lib/analytics';
 
 const POLL_INTERVAL_MS = 10000;
 const FEEDBACK_EMAIL = 'feedback@dingerzone.ai';
@@ -353,6 +354,7 @@ export default function TrialResultPage() {
   const handleShare = async () => {
     const shareUrl = window.location.href;
     setShareStatus('idle');
+    trackAnalyticsEvent('share_click', { location: 'trial_result' });
 
     try {
       if (navigator.share) {
@@ -362,17 +364,30 @@ export default function TrialResultPage() {
           url: shareUrl,
         });
         setShareStatus('shared');
+        trackAnalyticsEvent('share_success', {
+          location: 'trial_result',
+          method: 'native',
+        });
         return;
       }
 
       await navigator.clipboard.writeText(shareUrl);
       setShareStatus('copied');
+      trackAnalyticsEvent('share_success', {
+        location: 'trial_result',
+        method: 'clipboard',
+      });
     } catch {
       try {
         await navigator.clipboard.writeText(shareUrl);
         setShareStatus('copied');
+        trackAnalyticsEvent('share_success', {
+          location: 'trial_result',
+          method: 'clipboard_fallback',
+        });
       } catch {
         setShareStatus('error');
+        trackAnalyticsEvent('share_error', { location: 'trial_result' });
       }
     }
   };
@@ -382,6 +397,12 @@ export default function TrialResultPage() {
     if (!shareId || !feedbackCanSubmit) return;
 
     setFeedbackError(null);
+    trackAnalyticsEvent('trial_feedback_submit', {
+      sentiment: feedbackSentiment,
+      followUpConsent,
+      hasContactEmail: Boolean(contactEmail.trim()),
+      hasContactName: Boolean(contactName.trim()),
+    });
 
     try {
       const playbackSeconds = Number.isFinite(videoTime) ? videoTime.toFixed(2) : 'Unknown';
@@ -410,8 +431,12 @@ export default function TrialResultPage() {
         subject
       )}&body=${encodeURIComponent(body)}`;
       setFeedbackStatus('opened');
+      trackAnalyticsEvent('trial_feedback_email_opened', {
+        sentiment: feedbackSentiment,
+      });
     } catch {
       setFeedbackStatus('error');
+      trackAnalyticsEvent('trial_feedback_error');
       setFeedbackError(`Unable to open your email app. Please email ${FEEDBACK_EMAIL}.`);
     }
   };
@@ -463,6 +488,12 @@ export default function TrialResultPage() {
               <Link
                 href="/try"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-3 font-bold text-white hover:bg-orange-700"
+                onClick={() =>
+                  trackAnalyticsEvent('cta_click', {
+                    location: 'trial_result',
+                    label: 'analyze_another',
+                  })
+                }
               >
                 <RepeatOutlineIcon />
                 Analyze Another Swing
@@ -504,6 +535,9 @@ export default function TrialResultPage() {
                       <button
                         type="button"
                         onClick={() => {
+                          trackAnalyticsEvent('trial_feedback_toggle', {
+                            expanded: !showFeedbackForm,
+                          });
                           setShowFeedbackForm((current) => !current);
                           setFeedbackStatus((current) => (current === 'opened' ? 'idle' : current));
                           setFeedbackError(null);
@@ -657,6 +691,10 @@ export default function TrialResultPage() {
                         type="button"
                         onClick={() => {
                           setVideoError(null);
+                          trackAnalyticsEvent('video_mode_toggle', {
+                            location: 'trial_result',
+                            mode: showSkeleton ? 'original' : 'computer_vision',
+                          });
                           setShowSkeleton((current) => !current);
                         }}
                         disabled={!hasSkeleton}
@@ -693,10 +731,22 @@ export default function TrialResultPage() {
                         setVideoDuration(event.currentTarget.duration || null);
                         setVideoTime(event.currentTarget.currentTime || 0);
                       }}
+                      onPlay={() => {
+                        trackAnalyticsEvent('video_play', {
+                          location: 'trial_result',
+                          mode: showSkeleton && hasSkeleton ? 'computer_vision' : 'original',
+                          processed: isProcessed,
+                        });
+                      }}
                       onTimeUpdate={(event) => {
                         setVideoTime(event.currentTarget.currentTime || 0);
                       }}
                       onError={(event) => {
+                        trackAnalyticsEvent('video_error', {
+                          location: 'trial_result',
+                          mode: showSkeleton && hasSkeleton ? 'computer_vision' : 'original',
+                          processed: isProcessed,
+                        });
                         const mediaError = event.currentTarget.error;
                         console.error('Video playback error', {
                           mode: showSkeleton ? 'skeleton' : 'original',

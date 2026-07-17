@@ -10,6 +10,7 @@ import {
   fetchTrialVideoDetails,
   type LiveMetricSample,
 } from '../../../lib/trialApi';
+import { trackAnalyticsEvent } from '../../../lib/analytics';
 
 interface VideoDetails {
   videoUrl: string;
@@ -291,6 +292,12 @@ export default function SharedVideoPage() {
           <a
             href="https://www.dingerzone.com"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-800"
+            onClick={() =>
+              trackAnalyticsEvent('cta_click', {
+                location: 'shared_video_error',
+                label: 'back_to_dingerzone',
+              })
+            }
           >
             Back to DingerZone
           </a>
@@ -360,6 +367,10 @@ export default function SharedVideoPage() {
                 <span className="text-sm mr-2">Original</span>
                 <Switch
                   onChange={() => {
+                    trackAnalyticsEvent('video_mode_toggle', {
+                      location: 'shared_video',
+                      mode: isSkeleton ? 'original' : 'computer_vision',
+                    });
                     setIsSkeleton(!isSkeleton);
                     setVideoPlaybackError(null);
                     setHasVideoStarted(false);
@@ -394,6 +405,10 @@ export default function SharedVideoPage() {
                     setVideoTime(event.currentTarget.currentTime || 0);
                   }}
                   onPlay={(event) => {
+                    trackAnalyticsEvent('video_play', {
+                      location: 'shared_video',
+                      mode: isSkeleton ? 'computer_vision' : 'original',
+                    });
                     setHasVideoStarted(true);
                     setVideoPlaybackError(null);
                     watchForRenderedVideoFrame(event.currentTarget);
@@ -409,6 +424,10 @@ export default function SharedVideoPage() {
                     setVideoTime(event.currentTarget.currentTime || 0);
                   }}
                   onError={(e) => {
+                    trackAnalyticsEvent('video_error', {
+                      location: 'shared_video',
+                      mode: isSkeleton ? 'computer_vision' : 'original',
+                    });
                     console.error('Video playback error:', e);
                     setVideoPlaybackError(
                       'Video playback is unavailable in this browser, but the swing analysis is still available below.'

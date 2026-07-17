@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackAnalyticsEvent } from '../lib/analytics';
 
 const ShareIcon = () => (
   <svg
@@ -33,22 +34,36 @@ export default function SharePageButton({
   const handleShare = async () => {
     const url = window.location.href;
     setStatus('idle');
+    trackAnalyticsEvent('share_click', { location: 'example_page' });
 
     try {
       if (navigator.share) {
         await navigator.share({ title, text, url });
         setStatus('shared');
+        trackAnalyticsEvent('share_success', {
+          location: 'example_page',
+          method: 'native',
+        });
         return;
       }
 
       await navigator.clipboard.writeText(url);
       setStatus('copied');
+      trackAnalyticsEvent('share_success', {
+        location: 'example_page',
+        method: 'clipboard',
+      });
     } catch {
       try {
         await navigator.clipboard.writeText(url);
         setStatus('copied');
+        trackAnalyticsEvent('share_success', {
+          location: 'example_page',
+          method: 'clipboard_fallback',
+        });
       } catch {
         setStatus('error');
+        trackAnalyticsEvent('share_error', { location: 'example_page' });
       }
     }
   };

@@ -2,6 +2,8 @@
 import "./globals.css";
 import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,7 +32,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
         /> */}
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
