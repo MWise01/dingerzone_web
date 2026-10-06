@@ -1,3 +1,4 @@
+import { pageMetadata } from '../../lib/seo';
 // src/app/privacy/page.tsx
 import Header from '../../components/Header';
 import Footer from '@/components/Footer'; // Assuming you extract the footer into a component
@@ -118,7 +119,4 @@ export default function PrivacyPolicy() {
 }
 
 // Metadata for SEO
-export const metadata = {
-  title: 'DingerZone Privacy Policy',
-  description: 'Learn how DingerZone collects, uses, and protects your personal information when using our app and website.',
-};
+export const metadata = pageMetadata('Privacy Policy', 'Learn how DingerZone collects, uses, and protects your personal information.', '/privacy');
