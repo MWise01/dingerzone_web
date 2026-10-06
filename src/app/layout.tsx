@@ -1,36 +1,29 @@
 // src/app/layout.tsx
 import "./globals.css";
+import type { Metadata } from 'next';
+import { siteUrl, siteDescription } from '../lib/seo';
 import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'DingerZone - Backyard to Big Leagues',
-  description: 'Record, get AI tips, and show off to coaches with DingerZone.',
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/icon.png',
-  },
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: { default: 'DingerZone | AI Baseball Swing Analysis', template: '%s | DingerZone' },
+  description: siteDescription,
+  icons: { icon: '/favicon.ico' },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    // Previously functioning version - before incorporating shared links
-    // <html lang="en">
-    //   <body>{children}</body>
-    // </html>
     <html lang="en">
-      <head>
-        <title>DingerZone</title>
-        <meta name="description" content="Baseball swing analysis powered by AI" />
-        <link rel="icon" href="/favicon.ico" />
-        {/* <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
-          rel="stylesheet"
-        /> */}
-      </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

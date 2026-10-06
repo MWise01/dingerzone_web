@@ -59,6 +59,7 @@ export interface LiveMetricSample {
 
 export interface TrialVideoDetails {
   videoUrl: string;
+  originalVideoUrl?: string | null;
   skeletonUrl: string | null;
   thumbnailUrl: string | null;
   playerName: string;

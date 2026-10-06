@@ -5,10 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "../../public/assets/images/dingerzone_logo_outline.png";
+import { trackAnalyticsEvent } from "../lib/analytics";
 
 const navItems = [
   { name: "Home", href: "/#home-section" },
   { name: "Try It", href: "/try" },
+  { name: "Examples", href: "/examples" },
   { name: "About", href: "/#about-section" },
   { name: "FAQ", href: "/#faq-section" },
   { name: "Getting Started", href: "/getting-started" }, // separate page
@@ -23,6 +25,7 @@ export default function Header() {
   };
 
   const handleFeedbackClick = () => {
+    trackAnalyticsEvent("contact_click", { location: "header" });
     window.location.href = "mailto:feedback@dingerzone.ai";
   };
 
@@ -31,6 +34,11 @@ export default function Header() {
     href: string,
     closeMenu: boolean
   ) => {
+    trackAnalyticsEvent("navigation_click", {
+      label: href,
+      location: closeMenu ? "mobile_header" : "desktop_header",
+    });
+
     // Only care about in-page anchors like "/#about-section"
     if (href.startsWith("/#")) {
       const id = href.substring(2); // "/#faq-section" -> "faq-section"
@@ -99,7 +107,13 @@ export default function Header() {
           >
             Contact Us
           </button>
-          <a href="https://apple.co/3Js2maF" className="ml-4 inline-block">
+          <a
+            href="https://apple.co/3Js2maF"
+            className="ml-4 inline-block"
+            onClick={() =>
+              trackAnalyticsEvent("app_store_click", { location: "desktop_header" })
+            }
+          >
             <Image
               src="/assets/images/appstore_black.svg"
               alt="Download on the App Store"
@@ -173,7 +187,13 @@ export default function Header() {
           >
             Contact Us
           </button>
-          <a href="https://apple.co/3Js2maF" className="inline-block">
+          <a
+            href="https://apple.co/3Js2maF"
+            className="inline-block"
+            onClick={() =>
+              trackAnalyticsEvent("app_store_click", { location: "mobile_header" })
+            }
+          >
             <Image
               src="/assets/images/appstore_black.svg"
               alt="Download on the App Store"

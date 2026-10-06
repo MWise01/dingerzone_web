@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { trackAnalyticsEvent } from "../lib/analytics";
 
 export default function Footer() {
   const getStartedClick = () => {
+    trackAnalyticsEvent("contact_click", { location: "footer" });
     window.location.href = `mailto:feedback@dingerzone.ai?subject=${encodeURIComponent(
       "DingerZone Subscription"
     )}`;
@@ -15,7 +17,13 @@ export default function Footer() {
       <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
         <p className="text-gray-600">© DingerZone 2025</p>
         <div className="flex flex-wrap gap-4 mt-4 md:mt-0 items-center">
-          <Link href="/getting-started" className="text-gray-600 hover:text-gray-900">
+          <Link
+            href="/getting-started"
+            className="text-gray-600 hover:text-gray-900"
+            onClick={() =>
+              trackAnalyticsEvent("footer_link_click", { label: "getting_started" })
+            }
+          >
             Getting Started Guide
           </Link>
           <a href="/privacy" className="text-gray-600 hover:text-gray-900">
@@ -27,6 +35,7 @@ export default function Footer() {
           <a
             href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
             className="text-gray-600 hover:text-gray-900"
+            onClick={() => trackAnalyticsEvent("footer_link_click", { label: "eula" })}
           >
             EULA
           </a>
@@ -36,7 +45,13 @@ export default function Footer() {
           >
             Contact
           </button>
-          <a href="https://apple.co/3Js2maF" className="inline-block">
+          <a
+            href="https://apple.co/3Js2maF"
+            className="inline-block"
+            onClick={() =>
+              trackAnalyticsEvent("app_store_click", { location: "footer" })
+            }
+          >
             <Image
               src="/assets/images/appstore_black.svg"
               alt="Download on the App Store"
