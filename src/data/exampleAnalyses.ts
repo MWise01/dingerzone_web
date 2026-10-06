@@ -12,6 +12,7 @@ export type ExampleAnalysis = TrialVideoDetails & {
   audience: string;
   highlight: string;
   outcome: string;
+  discoverySummary: string;
   assetsPending?: boolean;
   analysisRun?: {
     videoRecordId: string;
@@ -35,8 +36,9 @@ const scorecard = (
 export const exampleAnalyses: ExampleAnalysis[] = [
   {
     slug: 'youth-fluid-rhythm',
+    discoverySummary: 'Explore torso coordination and lower-body timing, with suggestions for pause tee work, fence drills, and heel taps.',
     title: 'Youth Fluid Rhythm',
-    eyebrow: 'Real record test',
+    eyebrow: 'Rhythm and coordination',
     audience: 'Players and parents',
     highlight: 'Uses a curated example clip with real analysis output from the July 2026 rerun.',
     outcome: 'Shows rhythm, lower-body timing, torso coordination, original video, and computer-vision playback from example-specific assets.',
@@ -73,6 +75,7 @@ export const exampleAnalyses: ExampleAnalysis[] = [
   },
   {
     slug: 'youth-smooth-timing',
+    discoverySummary: 'Explore rotation sequencing, hand path, and core engagement, with suggestions for pause tee work, soft toss, and medicine ball throws.',
     title: 'Youth Smooth Timing',
     eyebrow: 'Timing and balance',
     audience: 'Players and parents',
@@ -111,6 +114,7 @@ export const exampleAnalyses: ExampleAnalysis[] = [
   },
   {
     slug: 'youth-power-sync',
+    discoverySummary: 'Explore lower-body initiation and pelvis timing, with suggestions for pause tee work, hip-focused soft toss, and fence drills.',
     title: 'Youth Power Sync',
     eyebrow: 'Power sequence',
     audience: 'Players and coaches',

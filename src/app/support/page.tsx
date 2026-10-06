@@ -1,3 +1,4 @@
+import { pageMetadata } from '../../lib/seo';
 // src/app/support/page.tsx
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
@@ -27,7 +28,4 @@ export default function Support() {
   );
 }
 
-export const metadata = {
-  title: 'DingerZone Support',
-  description: 'Contact the DingerZone support team for assistance with our app and services.',
-};
+export const metadata = pageMetadata('Support', 'Contact the DingerZone support team for assistance with our app and services.', '/support');
